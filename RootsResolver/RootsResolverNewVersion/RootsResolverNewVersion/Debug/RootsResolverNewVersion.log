@@ -1,8 +1,0 @@
-﻿  RootsResolverNewVersion.cpp
-D:\MIPT\Repo\MIPT\RootsResolver\RootsResolverNewVersion\RootsResolverNewVersion\RootsResolverNewVersion.cpp(140,8): warning C4477: 'scanf' : format string '%f' requires an argument of type 'float *', but variadic argument 1 has type 'double *'
-D:\MIPT\Repo\MIPT\RootsResolver\RootsResolverNewVersion\RootsResolverNewVersion\RootsResolverNewVersion.cpp(140,8): message : consider using '%lf' in the format string
-D:\MIPT\Repo\MIPT\RootsResolver\RootsResolverNewVersion\RootsResolverNewVersion\RootsResolverNewVersion.cpp(140,8): warning C4477: 'scanf' : format string '%f' requires an argument of type 'float *', but variadic argument 2 has type 'double *'
-D:\MIPT\Repo\MIPT\RootsResolver\RootsResolverNewVersion\RootsResolverNewVersion\RootsResolverNewVersion.cpp(140,8): message : consider using '%lf' in the format string
-D:\MIPT\Repo\MIPT\RootsResolver\RootsResolverNewVersion\RootsResolverNewVersion\RootsResolverNewVersion.cpp(140,8): warning C4477: 'scanf' : format string '%f' requires an argument of type 'float *', but variadic argument 3 has type 'double *'
-D:\MIPT\Repo\MIPT\RootsResolver\RootsResolverNewVersion\RootsResolverNewVersion\RootsResolverNewVersion.cpp(140,8): message : consider using '%lf' in the format string
-  RootsResolverNewVersion.vcxproj -> D:\MIPT\Repo\MIPT\RootsResolver\RootsResolverNewVersion\Debug\RootsResolverNewVersion.exe
