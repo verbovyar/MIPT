@@ -6,10 +6,10 @@
 #include <assert.h>
 
 enum RootsCount { 
-	INFINITE_ROOTS = -1, 
+	INFINITE = -1, 
 	ZERO = 0, 
-	ONEROOT = 1, 
-	TWOROOTS = 2
+	ONE = 1, 
+	TWO = 2
 };
 
 const char* GREETING = "Enter coefficients: a, b, c :";
@@ -20,10 +20,10 @@ void checkCorrect(int count, double* roots)
 	assert(roots != NULL);
 
 	if (count == ZERO ||
-		count == INFINITE_ROOTS ||
-		count == ONEROOT && roots[0] == 1 ||
-		count == ONEROOT && roots[0] == -1 ||
-		count == TWOROOTS && roots[0] == 3 && roots[1] == 2)
+		count == INFINITE ||
+		count == ONE && roots[0] == 1 ||
+		count == ONE && roots[0] == -1 ||
+		count == TWO && roots[0] == 3 && roots[1] == 2)
 	{
 		printf("CORRECT TEST\n");
 	}
@@ -41,14 +41,14 @@ RootsCount solveLinearEquation(double b, double c, double* roots)
 
 	if (b != 0)
 	{
-		count = ONEROOT;
+		count = ONE;
 		roots[0] = -c / b;
 	}
 	else
 	{
 		if (c == 0)
 		{
-			count = INFINITE_ROOTS;
+			count = INFINITE;
 		}
 		else
 		{
@@ -68,14 +68,14 @@ RootsCount solveSquareEquation(double a, double b, double c, double* roots)
 
 	if (discr > 0)
 	{
-		count = TWOROOTS;
+		count = TWO;
 		double sqrtdis = sqrt(discr);
 		roots[0] = (-b + sqrtdis) / (2 * a);
 		roots[1] = (-b - sqrtdis) / (2 * a);
 	}
 	else if (discr == 0)
 	{
-		count = ONEROOT;
+		count = ONE;
 		roots[0] = -b / (2 * a);
 	}
 	else if (discr < 0)
