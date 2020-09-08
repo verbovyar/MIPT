@@ -1,20 +1,29 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include<stdio.h>
-#include<math.h>
-#include<stdlib.h>
-#include<assert.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <assert.h>
 
-const int ZERO = 0;
-const int INFINITE_ROOTS = -1;
-const int ONEROOT = 1;
-const int TWOROOTS = 2;
+enum RootsCount { 
+	INFINITE_ROOTS = -1, 
+	ZERO = 0, 
+	ONEROOT = 1, 
+	TWOROOTS = 2
+};
+
 const char* GREETING = "Enter coefficients: a, b, c :";
 const char* ROOTS_COUNT_MSG = "Roots count : %d\n";
 
-void CORRECT(int count, double* roots) // just for my tests
+void checkCorrect(int count, double* roots) 
 {
-	if (count == 1 && roots[0] == -1 || count == -1 || count == 0 || count == 2 && roots[0] == 3 && roots[1] == 2 || count == 1 && roots[0] == 1)
+	assert(roots != NULL);
+
+	if (count == ZERO ||
+		count == INFINITE_ROOTS ||
+		count == ONEROOT && roots[0] == 1 ||
+		count == ONEROOT && roots[0] == -1 ||
+		count == TWOROOTS && roots[0] == 3 && roots[1] == 2)
 	{
 		printf("CORRECT TEST\n");
 	}
@@ -24,9 +33,11 @@ void CORRECT(int count, double* roots) // just for my tests
 	}
 }
 
-int solveLinearEquation(double b, double c, double* roots)
+RootsCount solveLinearEquation(double b, double c, double* roots)
 {
-	int count = ZERO;
+	assert(roots != NULL);
+
+	RootsCount count = ZERO;
 
 	if (b != 0)
 	{
@@ -48,22 +59,24 @@ int solveLinearEquation(double b, double c, double* roots)
 	return count;
 }
 
-int solveSquareEquation(double a, double b, double c, double* roots)
+RootsCount solveSquareEquation(double a, double b, double c, double* roots)
 {
-	int count = ZERO;
+	assert(roots != NULL);
+
+	RootsCount count = ZERO;
 	double discr = b * b - 4 * a * c;
 
-	if (discr > ZERO)
+	if (discr > 0)
 	{
 		count = TWOROOTS;
 		double sqrtdis = sqrt(discr);
-		roots[0] = (-b + sqrtdis) / 2 / a;
-		roots[1] = (-b - sqrtdis) / 2 / a;
+		roots[0] = (-b + sqrtdis) / (2 * a);
+		roots[1] = (-b - sqrtdis) / (2 * a);
 	}
 	else if (discr == 0)
 	{
 		count = ONEROOT;
-		roots[0] = -b / 2 / a;
+		roots[0] = -b / (2 * a);
 	}
 	else if (discr < 0)
 	{
@@ -83,41 +96,41 @@ void runUnitTests() // Test
 	//
 	b = 1;
 	c = 1;
-	int count = solveLinearEquation(b, c, roots); // count == 1  roots[0] == -1
-	CORRECT(count, roots);
+	RootsCount count = solveLinearEquation(b, c, roots); // count == 1  roots[0] == -1
+	checkCorrect(count, roots);
 
 	//
 	b = 0;
 	c = 0;
 	count = solveLinearEquation(b, c, roots); // count == -1
-	CORRECT(count, roots);
+	checkCorrect(count, roots);
 
 	//
 	b = 0;
 	c = 1;
 	count = solveLinearEquation(b, c, roots); // count == 0
-	CORRECT(count, roots);
+	checkCorrect(count, roots);
 
 	//
 	a = 1;
 	b = -5;
 	c = 6;
 	count = solveSquareEquation(a, b, c, roots); // count == 2 roots[0] == 3 roots[1] == 2
-	CORRECT(count, roots);
+	checkCorrect(count, roots);
 
 	//
 	a = 1;
 	b = -2;
 	c = 1;
 	count = solveSquareEquation(a, b, c, roots); // count == 1 roots[0] == 1
-	CORRECT(count, roots);
+	checkCorrect(count, roots);
 
 	//
 	a = 1;
 	b = 1;
 	c = 1;
 	count = solveSquareEquation(a, b, c, roots); // count == 0
-	CORRECT(count, roots);
+	checkCorrect(count, roots);
 }
 
 int main()
@@ -136,7 +149,7 @@ int main()
 	assert(isfinite(b));
 	assert(isfinite(c));
 
-	if (a == ZERO)
+	if (a == 0)
 	{
 		count = solveLinearEquation(b, c, roots);
 	}
