@@ -12,18 +12,20 @@ enum RootsCount {
 	TWO = 2
 };
 
-const char* GREETING = "Enter coefficients: a, b, c :";
-const char* ROOTS_COUNT_MSG = "Roots count : %d\n";
-
-void checkCorrect(int count, double* roots) 
+void checkCorrect(RootsCount actualCount, double* actualRoots, RootsCount expectedCount, double* expectedRoots)
 {
-	assert(roots != NULL);
+	assert(actualRoots != NULL);
+	assert(expectedRoots != NULL);
 
-	if (count == ZERO ||
-		count == INFINITE ||
-		count == ONE && roots[0] == 1 ||
-		count == ONE && roots[0] == -1 ||
-		count == TWO && roots[0] == 3 && roots[1] == 2)
+	bool correct = actualCount == expectedCount;
+	int index = 0;
+	while (correct && index < (int)actualCount && index < (int)expectedCount)
+	{
+		correct = actualRoots[index] == expectedRoots[index];
+		++index;
+	}
+
+	if (correct)
 	{
 		printf("CORRECT TEST\n");
 	}
@@ -86,68 +88,9 @@ RootsCount solveSquareEquation(double a, double b, double c, double* roots)
 	return count;
 }
 
-void runUnitTests() // Test 
+RootsCount solveEquation(double a, double b, double c, double* roots)
 {
-	double roots[2];
-	double a;
-	double b;
-	double c;
-
-	//
-	b = 1;
-	c = 1;
-	RootsCount count = solveLinearEquation(b, c, roots); // count == 1  roots[0] == -1
-	checkCorrect(count, roots);
-
-	//
-	b = 0;
-	c = 0;
-	count = solveLinearEquation(b, c, roots); // count == -1
-	checkCorrect(count, roots);
-
-	//
-	b = 0;
-	c = 1;
-	count = solveLinearEquation(b, c, roots); // count == 0
-	checkCorrect(count, roots);
-
-	//
-	a = 1;
-	b = -5;
-	c = 6;
-	count = solveSquareEquation(a, b, c, roots); // count == 2 roots[0] == 3 roots[1] == 2
-	checkCorrect(count, roots);
-
-	//
-	a = 1;
-	b = -2;
-	c = 1;
-	count = solveSquareEquation(a, b, c, roots); // count == 1 roots[0] == 1
-	checkCorrect(count, roots);
-
-	//
-	a = 1;
-	b = 1;
-	c = 1;
-	count = solveSquareEquation(a, b, c, roots); // count == 0
-	checkCorrect(count, roots);
-}
-
-int main()
-{
-	runUnitTests();
-
-	double roots[2];
-	double a = NAN;
-	double b = NAN;
-	double c = NAN;
-	int count = ZERO;
-
-	printf(GREETING);
-	scanf("%lf %lf %lf", &a, &b, &c);
-	assert(isfinite(a));
-	assert(isfinite(b));
-	assert(isfinite(c));
+	RootsCount count = ZERO;
 
 	if (a == 0)
 	{
@@ -158,7 +101,94 @@ int main()
 		count = solveSquareEquation(a, b, c, roots);
 	}
 
-	printf(ROOTS_COUNT_MSG, count);
+	return count;
+}
+
+void runUnitTests() // Test 
+{
+	double actualRoots[2];
+	double expectedRoots[2];
+	RootsCount expectedCount;
+	double a;
+	double b;
+	double c;
+
+	//
+	b = 1;
+	c = 1;
+	RootsCount actualCount = solveLinearEquation(b, c, actualRoots);
+	expectedCount = ONE;
+	expectedRoots[0] = -1;
+	expectedRoots[1] = NULL;
+	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+
+	//
+	b = 0;
+	c = 0;
+	actualCount = solveLinearEquation(b, c, actualRoots);
+	expectedCount = INFINITE;
+	expectedRoots[0] = NULL;
+	expectedRoots[1] = NULL;
+	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+
+	//
+	b = 0;
+	c = 1;
+	actualCount = solveLinearEquation(b, c, actualRoots);
+	expectedCount = ZERO;
+	expectedRoots[0] = NULL;
+	expectedRoots[1] = NULL;
+	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+
+	//
+	a = 1;
+	b = -5;
+	c = 6;
+	actualCount = solveSquareEquation(a, b, c, actualRoots);
+	expectedCount = TWO;
+	expectedRoots[0] = 3;
+	expectedRoots[1] = 2;
+	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+
+	//
+	a = 1;
+	b = -2;
+	c = 1;
+	actualCount = solveSquareEquation(a, b, c, actualRoots);
+	expectedCount = ONE;
+	expectedRoots[0] = 1;
+	expectedRoots[1] = NULL;
+	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+
+	//
+	a = 1;
+	b = 1;
+	c = 1;
+	actualCount = solveSquareEquation(a, b, c, actualRoots);
+	expectedCount = ZERO;
+	expectedRoots[0] = NULL;
+	expectedRoots[1] = NULL;
+	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+}
+
+int main()
+{
+	runUnitTests();
+
+	double a = NAN;
+	double b = NAN;
+	double c = NAN;
+
+	printf("Enter coefficients: a, b, c :");
+	scanf("%lf %lf %lf", &a, &b, &c);
+	assert(isfinite(a));
+	assert(isfinite(b));
+	assert(isfinite(c));
+	
+	double roots[2];
+	RootsCount count = solveEquation(a, b, c, roots);
+
+	printf("Roots count : %d\n", count);
 	for (int index = 0; index < count; ++index)
 	{
 		printf("%f ", roots[index]);
