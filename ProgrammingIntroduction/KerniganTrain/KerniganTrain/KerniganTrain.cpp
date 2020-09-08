@@ -4,11 +4,16 @@
 #include<math.h>
 
 #define MAXLINE 1000
+#define IFELSE(a, b) if (a > b) \
+                        {\
+                            printf("NO");\
+                        }
 
 // const
 const int MAX = 1001;
 const char* privet = "Hello wordl";
 const int array[5] = { 1, 2, 3, 4, 5 };
+static int my = 1; // dont view in any files
 
 int power(int x, int n)
 {
@@ -107,6 +112,8 @@ int main()
 {
     char str[MAX] = {0};
     int array[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    IFELSE(2, 1); // macro
 
     myget(str);
 
