@@ -58,14 +58,17 @@ RootsCount solveLinearEquation(double b, double c, double* x1)
 
 	RootsCount count = ZERO;
 
-	if (b != 0)
+	bool flagC = isZero(c);
+	bool flagB = isZero(b);
+
+	if (!flagB)
 	{
 		count = ONE;
 		*x1 = -c / b;
 	}
 	else
 	{
-		if (c == 0)
+		if (flagC)
 		{
 			count = INFINITE;
 		}
@@ -110,7 +113,9 @@ RootsCount solveEquation(double a, double b, double c, double* x1, double* x2)
 {
 	RootsCount count = ZERO;
 
-	if (a == 0)
+	bool flag = isZero(a);
+
+	if (flag)
 	{
 		count = solveLinearEquation(b, c, x1);
 	}
