@@ -12,17 +12,32 @@ enum RootsCount {
 	TWO = 2
 };
 
-void checkCorrect(RootsCount actualCount, double* actualRoots, RootsCount expectedCount, double* expectedRoots)
+bool isZero(double disr)
 {
-	assert(actualRoots != NULL);
-	assert(expectedRoots != NULL);
+	if (fabs(disr) < 1e-5)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, RootsCount expectedCount, double* expectedx1, double* expectedx2)
+{
+	assert(&actualx1 != NULL && &actualx2 != NULL);
+	assert(&expectedx1 != NULL && &expectedx2 != NULL);
 
 	bool correct = actualCount == expectedCount;
-	int index = 0;
-	while (correct && index < (int)actualCount && index < (int)expectedCount)
+	if (actualCount == ONE)
 	{
-		correct = actualRoots[index] == expectedRoots[index];
-		++index;
+		correct = *expectedx1 == *actualx1;
+	}
+	else if (actualCount == TWO)
+	{
+		correct = *expectedx1 == *actualx1;
+		correct = *expectedx2 == *actualx2;
 	}
 
 	if (correct)
@@ -35,16 +50,16 @@ void checkCorrect(RootsCount actualCount, double* actualRoots, RootsCount expect
 	}
 }
 
-RootsCount solveLinearEquation(double b, double c, double* roots)
+RootsCount solveLinearEquation(double b, double c, double* x1)
 {
-	assert(roots != NULL);
+	assert(&x1 != NULL);
 
 	RootsCount count = ZERO;
 
 	if (b != 0)
 	{
 		count = ONE;
-		roots[0] = -c / b;
+		*x1 = -c / b;
 	}
 	else
 	{
@@ -61,24 +76,25 @@ RootsCount solveLinearEquation(double b, double c, double* roots)
 	return count;
 }
 
-RootsCount solveSquareEquation(double a, double b, double c, double* roots)
+RootsCount solveSquareEquation(double a, double b, double c, double* x1, double* x2)
 {
-	assert(roots != NULL);
+	assert(&x1 != NULL && &x2 != NULL);
 
 	RootsCount count = ZERO;
 	double discr = b * b - 4 * a * c;
+	bool flag = isZero(discr);
 
-	if (discr > 0)
+	if (flag)
+	{
+		count = ONE;
+		*x1 = -b / (2 * a);
+	}
+	else if (discr > 0)
 	{
 		count = TWO;
 		double sqrtdis = sqrt(discr);
-		roots[0] = (-b + sqrtdis) / (2 * a);
-		roots[1] = (-b - sqrtdis) / (2 * a);
-	}
-	else if (discr == 0)
-	{
-		count = ONE;
-		roots[0] = -b / (2 * a);
+		*x1 = (-b + sqrtdis) / (2 * a);
+		*x2 = (-b - sqrtdis) / (2 * a);
 	}
 	else if (discr < 0)
 	{
@@ -88,17 +104,17 @@ RootsCount solveSquareEquation(double a, double b, double c, double* roots)
 	return count;
 }
 
-RootsCount solveEquation(double a, double b, double c, double* roots)
+RootsCount solveEquation(double a, double b, double c, double* x1, double* x2)
 {
 	RootsCount count = ZERO;
 
 	if (a == 0)
 	{
-		count = solveLinearEquation(b, c, roots);
+		count = solveLinearEquation(b, c, x1);
 	}
 	else
 	{
-		count = solveSquareEquation(a, b, c, roots);
+		count = solveSquareEquation(a, b, c, x1, x2);
 	}
 
 	return count;
@@ -106,8 +122,10 @@ RootsCount solveEquation(double a, double b, double c, double* roots)
 
 void runUnitTests() // Test 
 {
-	double actualRoots[2];
-	double expectedRoots[2];
+	double actualx1;
+	double actualx2;
+	double expectedx1;
+	double expectedx2;
 	RootsCount expectedCount;
 	double a;
 	double b;
@@ -116,59 +134,59 @@ void runUnitTests() // Test
 	//
 	b = 1;
 	c = 1;
-	RootsCount actualCount = solveLinearEquation(b, c, actualRoots);
+	RootsCount actualCount = solveLinearEquation(b, c, &actualx1);
 	expectedCount = ONE;
-	expectedRoots[0] = -1;
-	expectedRoots[1] = NULL;
-	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+	expectedx1 = -1;
+	expectedx2 = NAN;
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
 
 	//
 	b = 0;
 	c = 0;
-	actualCount = solveLinearEquation(b, c, actualRoots);
+	actualCount = solveLinearEquation(b, c, &actualx1);
 	expectedCount = INFINITE;
-	expectedRoots[0] = NULL;
-	expectedRoots[1] = NULL;
-	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+	expectedx1 = NAN;
+	expectedx2 = NAN;
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
 
 	//
 	b = 0;
 	c = 1;
-	actualCount = solveLinearEquation(b, c, actualRoots);
+	actualCount = solveLinearEquation(b, c, &actualx1);
 	expectedCount = ZERO;
-	expectedRoots[0] = NULL;
-	expectedRoots[1] = NULL;
-	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+	expectedx1 = NAN;
+	expectedx2 = NAN;
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
 
 	//
 	a = 1;
 	b = -5;
 	c = 6;
-	actualCount = solveSquareEquation(a, b, c, actualRoots);
+	actualCount = solveSquareEquation(a, b, c, &actualx1, &actualx2);
 	expectedCount = TWO;
-	expectedRoots[0] = 3;
-	expectedRoots[1] = 2;
-	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+	expectedx1 = 3;
+	expectedx2 = 2;
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
 
 	//
 	a = 1;
 	b = -2;
 	c = 1;
-	actualCount = solveSquareEquation(a, b, c, actualRoots);
+	actualCount = solveSquareEquation(a, b, c, &actualx1, &actualx2);
 	expectedCount = ONE;
-	expectedRoots[0] = 1;
-	expectedRoots[1] = NULL;
-	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+	expectedx1 = 1;
+	expectedx2 = NAN;
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
 
 	//
 	a = 1;
 	b = 1;
 	c = 1;
-	actualCount = solveSquareEquation(a, b, c, actualRoots);
+	actualCount = solveSquareEquation(a, b, c, &actualx1, &actualx2);
 	expectedCount = ZERO;
-	expectedRoots[0] = NULL;
-	expectedRoots[1] = NULL;
-	checkCorrect(actualCount, actualRoots, expectedCount, expectedRoots);
+	expectedx1 = NAN;
+	expectedx2 = NAN;
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
 }
 
 int main()
@@ -185,13 +203,23 @@ int main()
 	assert(isfinite(b));
 	assert(isfinite(c));
 	
-	double roots[2];
-	RootsCount count = solveEquation(a, b, c, roots);
+	double x1 = NAN;
+	double x2 = NAN;
+	RootsCount count = solveEquation(a, b, c, &x1, &x2);
 
-	printf("Roots count : %d\n", count);
-	for (int index = 0; index < count; ++index)
+	// EDIT!
+
+	if (count == TWO)
 	{
-		printf("%f ", roots[index]);
+		printf("Roots: %lf %lf", x1, x2);
+	}
+	else if (count == ONE)
+	{
+		printf("Root: %lf", x1);
+	}
+	else
+	{
+		printf("count of roots: %d", count);
 	}
 
 	return 0;
