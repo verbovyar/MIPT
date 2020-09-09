@@ -1,20 +1,22 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
+#include <math.h>
 #include <assert.h>
 
-enum RootsCount { 
-	INFINITE = -1, 
-	ZERO = 0, 
-	ONE = 1, 
-	TWO = 2
+const double ISZERO = 1e-5;
+
+enum RootsCount {
+	INFINITE = -1,
+	ZERO = 0,
+	ONE = 1,
+	TWO = 2,
 };
 
 bool isZero(double disr)
 {
-	if (fabs(disr) < 1e-5)
+	if (fabs(disr) < ISZERO)
 	{
 		return true;
 	}
