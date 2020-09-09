@@ -207,8 +207,6 @@ int main()
 	double x2 = NAN;
 	RootsCount count = solveEquation(a, b, c, &x1, &x2);
 
-	// EDIT!
-
 	if (count == TWO)
 	{
 		printf("Roots: %lf %lf", x1, x2);
