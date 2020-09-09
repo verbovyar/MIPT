@@ -5,7 +5,7 @@
 #include <math.h>
 #include <assert.h>
 
-const double ISZERO = 1e-5;
+const double PRECISION = 1e-5;
 
 enum RootsCount {
 	INFINITE = -1,
@@ -16,14 +16,7 @@ enum RootsCount {
 
 bool isZero(double disr)
 {
-	if (fabs(disr) < ISZERO)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return (fabs(disr) < PRECISION);
 }
 
 void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, RootsCount expectedCount, double* expectedx1, double* expectedx2)
@@ -54,21 +47,21 @@ void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, Ro
 
 RootsCount solveLinearEquation(double b, double c, double* x1)
 {
-	assert(&x1 != NULL);
+	assert(x1 != NULL);
 
 	RootsCount count = ZERO;
 
-	bool flagC = isZero(c);
-	bool flagB = isZero(b);
+	bool isCZero = isZero(c);
+	bool isBZero = isZero(b);
 
-	if (!flagB)
+	if (!isBZero)
 	{
 		count = ONE;
 		*x1 = -c / b;
 	}
 	else
 	{
-		if (flagC)
+		if (isCZero)
 		{
 			count = INFINITE;
 		}
@@ -83,13 +76,13 @@ RootsCount solveLinearEquation(double b, double c, double* x1)
 
 RootsCount solveSquareEquation(double a, double b, double c, double* x1, double* x2)
 {
-	assert(&x1 != NULL && &x2 != NULL);
+	assert(x1 != NULL && x2 != NULL);
 
 	RootsCount count = ZERO;
 	double discr = b * b - 4 * a * c;
-	bool flag = isZero(discr);
+	bool isDiscrZero = isZero(discr);
 
-	if (flag)
+	if (isDiscrZero)
 	{
 		count = ONE;
 		*x1 = -b / (2 * a);
