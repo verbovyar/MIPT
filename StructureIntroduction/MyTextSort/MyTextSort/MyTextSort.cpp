@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 const int MAX = 1000;
-const int MAXLEN = 5000;
+const int MAXLEN = 4000;
 
 void separationOnLines(char* line[], char* templine, int countOfStr, int index)
 {
