@@ -5,37 +5,10 @@
 #include <stdlib.h>
 
 const int MAX = 1000;
-const int MAXLEN = 50000;
+const int MAXLEN = 5000;
 
-void readTxtFile(char* line[])
+void separationOnLines(char* line[], char* templine, int countOfStr, int index)
 {
-    FILE* hamlet = fopen("hamlet.txt", "r");
-
-    char templine[MAXLEN] = { 0 };
-
-    if (hamlet == NULL)
-    {
-        printf("ERROR!");
-
-        return;
-    }
-
-    char symb;
-    int countOfStr = 0;
-    int index = 0;
-    while ((symb = fgetc(hamlet)) != EOF)
-    {
-        templine[index] = symb;
-        ++index;
-
-        if (symb == '\n')
-        {
-            ++countOfStr;
-        }
-    }
-
-    fclose(hamlet);
-
     int j = 0;
     for (int i = 0; i < countOfStr; ++i)
     {
@@ -57,7 +30,32 @@ void readTxtFile(char* line[])
 
         line[i] = temp;
     }
+}
 
+void sortLines(char* line[], int countOfStr)
+{
+    for (int index1 = 0; index1 < countOfStr; ++index1)
+    {
+        for (int index2 = countOfStr - 1; index2 > index1; index2--)
+        {
+            int i = 0;
+            while (*(line[index2 - 1] + i) == *(line[index2] + i))
+            {
+                ++i;
+            }
+
+            if (*(line[index2 - 1] + i) > *(line[index2] + i))
+            {
+                char *temp = line[index2 - 1];
+                line[index2 - 1] = line[index2];
+                line[index2] = temp;
+            }
+        }
+    }
+}
+
+void writeTxtFile(char* line[], int countOfStr)
+{
     FILE* fileout = fopen("output.txt", "w");
 
     for (int k = 0; k < countOfStr; ++k)
@@ -68,10 +66,47 @@ void readTxtFile(char* line[])
     fclose(fileout);
 }
 
+void readTxtFileInOneLine(char* line[])
+{
+    FILE* hamlet = fopen("hamlet.txt", "r");
+
+    if (hamlet == NULL)
+    {
+        printf("ERROR!");
+
+        return;
+    }
+
+    char templine[MAXLEN] = { 0 };
+    char symb;
+    int countOfStr = 0;
+    int index = 0;
+    while ((symb = fgetc(hamlet)) != EOF)
+    {
+        templine[index] = symb;
+        ++index;
+
+        if (symb == '\n')
+        {
+            ++countOfStr;
+        }
+    }
+
+    fclose(hamlet);
+
+    // in main;
+    separationOnLines(line, templine, countOfStr, index);
+
+    sortLines(line, countOfStr);
+
+    writeTxtFile(line, countOfStr);
+}
+
 int main()
 {
     char* hamletLines[36];
-    readTxtFile(hamletLines);
+
+    readTxtFileInOneLine(hamletLines);
 
     return 0;
 }
