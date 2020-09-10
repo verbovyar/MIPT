@@ -21,8 +21,8 @@ bool isZero(double disr)
 
 void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, RootsCount expectedCount, double* expectedx1, double* expectedx2)
 {
-	assert(&actualx1 != NULL && &actualx2 != NULL);
-	assert(&expectedx1 != NULL && &expectedx2 != NULL);
+	assert(actualx1 != NULL && actualx2 != NULL);
+	assert(expectedx1 != NULL && expectedx2 != NULL);
 
 	bool correct = actualCount == expectedCount;
 	if (actualCount == ONE)
