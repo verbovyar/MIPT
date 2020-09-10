@@ -31,8 +31,7 @@ void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, Ro
 	}
 	else if (actualCount == TWO)
 	{
-		correct = *expectedx1 == *actualx1;
-		correct = *expectedx2 == *actualx2;
+		correct = (*expectedx1 == *actualx1 && *expectedx2 == *actualx2);
 	}
 
 	if (correct)
@@ -51,17 +50,14 @@ RootsCount solveLinearEquation(double b, double c, double* x1)
 
 	RootsCount count = ZERO;
 
-	bool isCZero = isZero(c);
-	bool isBZero = isZero(b);
-
-	if (!isBZero)
+	if (!isZero(b))
 	{
 		count = ONE;
 		*x1 = -c / b;
 	}
 	else
 	{
-		if (isCZero)
+		if (isZero(c))
 		{
 			count = INFINITE;
 		}
@@ -80,9 +76,8 @@ RootsCount solveSquareEquation(double a, double b, double c, double* x1, double*
 
 	RootsCount count = ZERO;
 	double discr = b * b - 4 * a * c;
-	bool isDiscrZero = isZero(discr);
 
-	if (isDiscrZero)
+	if (isZero(discr))
 	{
 		count = ONE;
 		*x1 = -b / (2 * a);
@@ -104,11 +99,14 @@ RootsCount solveSquareEquation(double a, double b, double c, double* x1, double*
 
 RootsCount solveEquation(double a, double b, double c, double* x1, double* x2)
 {
+	assert(isfinite(a));
+	assert(isfinite(b));
+	assert(isfinite(c));
+	assert(x1 != NULL && x2 != NULL);
+
 	RootsCount count = ZERO;
-
-	bool flag = isZero(a);
-
-	if (flag)
+	
+	if (isZero(a))
 	{
 		count = solveLinearEquation(b, c, x1);
 	}
@@ -122,14 +120,14 @@ RootsCount solveEquation(double a, double b, double c, double* x1, double* x2)
 
 void runUnitTests() // Test 
 {
-	double actualx1;
-	double actualx2;
-	double expectedx1;
-	double expectedx2;
-	RootsCount expectedCount;
-	double a;
-	double b;
-	double c;
+	double actualx1 = NULL;
+	double actualx2 = NULL;
+	double expectedx1 = NULL;
+	double expectedx2 = NULL;
+	RootsCount expectedCount = ZERO;
+	double a = NULL;
+	double b = NULL;
+	double c = NULL;
 
 	//
 	b = 1;
@@ -199,9 +197,6 @@ int main()
 
 	printf("Enter coefficients of equation: a, b, c :");
 	scanf("%lf %lf %lf", &a, &b, &c);
-	assert(isfinite(a));
-	assert(isfinite(b));
-	assert(isfinite(c));
 	
 	double x1 = NAN;
 	double x2 = NAN;
