@@ -11,9 +11,9 @@ void writeTxtFile(char* line[], int countOfStr)
 {
     FILE* fileout = fopen("output.txt", "w");
 
-    for (int k = 0; k < countOfStr; ++k)
+    for (int index = 0; index < countOfStr; ++index)
     {
-        fprintf(fileout, "%s\n", line[k]);
+        fprintf(fileout, "%s\n", line[index]);
     }
 
     fclose(fileout);
@@ -43,28 +43,28 @@ void sortLines(char* line[], int countOfStr)
     writeTxtFile(line, countOfStr);
 }
 
-void separationOnLines(char* line[], char* templine, int countOfStr, int index)
+void separationOnLines(char* line[], char* templine, int countOfStr, int count)
 {
-    int j = 0;
-    for (int i = 0; i < countOfStr; ++i)
+    int index1 = 0;
+    for (int index = 0; index < countOfStr; ++index)
     {
         char* temp = (char*)calloc(MAX, sizeof(char));
-        int k = 0;
-        for (; j < index; ++j)
+        int index2 = 0;
+        for (; index1 < count; ++index1)
         {
-            if (templine[j] != '\n')
+            if (templine[index1] != '\n')
             {
-                temp[k] = templine[j];
-                k++;
+                temp[index2] = templine[index1];
+                index2++;
             }
             else
             {
-                ++j;
+                ++index1;
                 break;
             }
         }
 
-        line[i] = temp;
+        line[index] = temp;
     }
 
     sortLines(line, countOfStr);
@@ -106,6 +106,8 @@ int main()
     char* hamletLines[36];
 
     readTxtFileInOneLine(hamletLines);
+
+    printf("successful\n");
 
     return 0;
 }
