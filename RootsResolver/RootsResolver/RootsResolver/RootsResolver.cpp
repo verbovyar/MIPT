@@ -14,9 +14,9 @@ enum RootsCount {
 	TWO = 2,
 };
 
-bool isZero(double disr)
+bool isZero(double value)
 {
-	return (fabs(disr) < PRECISION);
+	return (fabs(value) < PRECISION);
 }
 
 void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, RootsCount expectedCount, double* expectedx1, double* expectedx2)
