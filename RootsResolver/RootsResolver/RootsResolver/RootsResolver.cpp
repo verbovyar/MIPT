@@ -197,7 +197,7 @@ int main()
 	double b = NAN;
 	double c = NAN;
 
-	printf("Enter coefficients: a, b, c :");
+	printf("Enter coefficients of equation: a, b, c :");
 	scanf("%lf %lf %lf", &a, &b, &c);
 	assert(isfinite(a));
 	assert(isfinite(b));
