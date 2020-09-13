@@ -11,7 +11,7 @@ enum RootsCount {
 	INFINITE = -1,
 	ZERO = 0,
 	ONE = 1,
-	TWO = 2,
+	TWO = 2
 };
 
 bool isZero(double value)
@@ -19,10 +19,10 @@ bool isZero(double value)
 	return (fabs(value) < PRECISION);
 }
 
-void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, RootsCount expectedCount, double* expectedx1, double* expectedx2)
+void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, RootsCount expectedCount, double* expectedx1, double* expectedx2, int line)
 {
-	assert(actualx1 != NULL && actualx2 != NULL);
-	assert(expectedx1 != NULL && expectedx2 != NULL);
+	assert (actualx1 != NULL && actualx2 != NULL);
+	assert (expectedx1 != NULL && expectedx2 != NULL);
 
 	bool correct = actualCount == expectedCount;
 	if (actualCount == ONE)
@@ -36,17 +36,17 @@ void checkCorrect(RootsCount actualCount, double* actualx1, double* actualx2, Ro
 
 	if (correct)
 	{
-		printf("CORRECT TEST\n");
+		printf ("CORRECT TEST\n");
 	}
 	else
 	{
-		printf("WARNING! INCORRECT TEST %d\n", __LINE__);
+		printf ("WARNING! INCORRECT TEST %d\n", line);
 	}
 }
 
 RootsCount solveLinearEquation(double b, double c, double* x1)
 {
-	assert(x1 != NULL);
+	assert (x1 != NULL);
 
 	RootsCount count = ZERO;
 
@@ -72,7 +72,7 @@ RootsCount solveLinearEquation(double b, double c, double* x1)
 
 RootsCount solveSquareEquation(double a, double b, double c, double* x1, double* x2)
 {
-	assert(x1 != NULL && x2 != NULL);
+	assert (x1 != NULL && x2 != NULL);
 
 	RootsCount count = ZERO;
 	double discr = b * b - 4 * a * c;
@@ -99,10 +99,10 @@ RootsCount solveSquareEquation(double a, double b, double c, double* x1, double*
 
 RootsCount solveEquation(double a, double b, double c, double* x1, double* x2)
 {
-	assert(isfinite(a));
-	assert(isfinite(b));
-	assert(isfinite(c));
-	assert(x1 != NULL && x2 != NULL);
+	assert (isfinite(a));
+	assert (isfinite(b));
+	assert (isfinite(c));
+	assert (x1 != NULL && x2 != NULL);
 
 	RootsCount count = ZERO;
 	
@@ -136,7 +136,7 @@ void runUnitTests() // Test
 	expectedCount = ONE;
 	expectedx1 = -1;
 	expectedx2 = NAN;
-	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2, __LINE__);
 
 	//
 	b = 0;
@@ -145,7 +145,7 @@ void runUnitTests() // Test
 	expectedCount = INFINITE;
 	expectedx1 = NAN;
 	expectedx2 = NAN;
-	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2, __LINE__);
 
 	//
 	b = 0;
@@ -154,7 +154,7 @@ void runUnitTests() // Test
 	expectedCount = ZERO;
 	expectedx1 = NAN;
 	expectedx2 = NAN;
-	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2, __LINE__);
 
 	//
 	a = 1;
@@ -164,7 +164,7 @@ void runUnitTests() // Test
 	expectedCount = TWO;
 	expectedx1 = 3;
 	expectedx2 = 2;
-	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2, __LINE__);
 
 	//
 	a = 1;
@@ -174,7 +174,7 @@ void runUnitTests() // Test
 	expectedCount = ONE;
 	expectedx1 = 1;
 	expectedx2 = NAN;
-	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2, __LINE__);
 
 	//
 	a = 1;
@@ -184,7 +184,7 @@ void runUnitTests() // Test
 	expectedCount = ZERO;
 	expectedx1 = NAN;
 	expectedx2 = NAN;
-	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2);
+	checkCorrect(actualCount, &actualx1, &actualx2, expectedCount, &expectedx1, &expectedx2, __LINE__);
 }
 
 int main()
