@@ -15,6 +15,26 @@ const char* privet = "Hello wordl";
 const int array[5] = { 1, 2, 3, 4, 5 };
 static int my = 1; // dont view in any files
 
+
+// point
+struct point
+{
+    int x;
+    int y;
+};
+
+// make point
+
+struct point makepoint(int x, int y)
+{
+    struct point temp;
+
+    temp.x = x;
+    temp.y = y;
+
+    return temp;
+}
+
 int power(int x, int n)
 {
     int p = 1;
@@ -110,6 +130,9 @@ int trim(char s[])
 
 int main()
 {
+    struct point newpoint = makepoint(7, 2);
+    printf("%d %d\n", newpoint.x, newpoint.y);
+
     char str[MAX] = {0};
     int array[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
