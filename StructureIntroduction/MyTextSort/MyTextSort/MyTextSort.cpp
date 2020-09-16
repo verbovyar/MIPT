@@ -4,9 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-const int MAX = 1000;
-const int MAXLEN = 4000;
-
 void writeTxtFile(char* line[], int countOfStr)
 {
     FILE* fileout = fopen("output.txt", "w");
@@ -43,71 +40,52 @@ void sortLines(char* line[], int countOfStr)
     writeTxtFile(line, countOfStr);
 }
 
-void separationOnLines(char* line[], char* templine, int countOfStr, int count)
+// new funct
+int findFileSize(FILE* fileName)
 {
-    int index1 = 0;
-    for (int index = 0; index < countOfStr; ++index)
-    {
-        char* temp = (char*)calloc(MAX, sizeof(char));
-        int index2 = 0;
-        for (; index1 < count; ++index1)
-        {
-            if (templine[index1] != '\n')
-            {
-                temp[index2] = templine[index1];
-                index2++;
-            }
-            else
-            {
-                ++index1;
-                break;
-            }
-        }
+    fseek(fileName, 0, SEEK_END);
+    const int sizeOfFile = ftell(fileName);
+    fseek(fileName, 0, SEEK_SET);
 
-        line[index] = temp;
-    }
-
-    sortLines(line, countOfStr);
+    return sizeOfFile;
 }
 
-void readTxtFileInOneLine(char* line[])
+int findCountOfStr(char* buffer, int sizeOfFile)
 {
-    FILE* hamlet = fopen("hamlet.txt", "r");
-
-    if (hamlet == NULL)
-    {
-        printf("ERROR!");
-
-        return;
-    }
-
-    char templine[MAXLEN] = { 0 };
-    char symb;
     int countOfStr = 0;
-    int index = 0;
-    while ((symb = fgetc(hamlet)) != EOF)
-    {
-        templine[index] = symb;
-        ++index;
 
-        if (symb == '\n')
+    for (int index = 0; index < sizeOfFile; ++index)
+    {
+        if (buffer[index] == '\n')
         {
             ++countOfStr;
         }
     }
 
-    fclose(hamlet);
-
-    separationOnLines(line, templine, countOfStr, index);
+    return countOfStr;
 }
+
+//void makeLines(char* buffer, char** lines, int sizeOfFile)
+//{
+ //   for (int index = 0; index < sizeOfFile; ++index)
+ //   {
+
+ //   }
+//} 
 
 int main()
 {
-    char* hamletLines[36];
+    FILE* fileName = fopen("hamlet.txt", "r"); // add const value for TXT file 
 
-    readTxtFileInOneLine(hamletLines);
+    const int sizeOfFile = findFileSize(fileName);
+    char* buffer = (char*)calloc(sizeOfFile + 1, sizeof(char));
+    fread(buffer, sizeof(char), sizeOfFile, fileName);
+    
+    fclose(fileName);
 
-    printf("successful\n");
+    const int countOfStr = findCountOfStr(buffer, sizeOfFile);
+    char** lines = (char**)calloc(countOfStr + 1, sizeof(char*));
+   // makeLines(buffer, lines, sizeOfFile);
 
     return 0;
 }
