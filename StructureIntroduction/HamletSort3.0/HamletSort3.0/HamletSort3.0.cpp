@@ -108,7 +108,8 @@ int main()
 
     writeTxtFile(lines, countOfStr);
     
-    //free
+    free(buffer);
+    free(lines);
 
     return 0;
 }
