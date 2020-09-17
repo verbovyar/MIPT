@@ -94,7 +94,7 @@ int main()
 
     sortLines(lines, countOfStr);
 
-    //writeTxtFile(lines, countOfStr);
+    writeTxtFile(lines, countOfStr);
 
     //free
 
