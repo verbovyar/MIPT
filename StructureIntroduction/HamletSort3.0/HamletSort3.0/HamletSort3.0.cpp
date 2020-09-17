@@ -57,6 +57,8 @@ void makeLines(char* buffer, char** lines, int sizeOfFile, int countOfStr)
 
 void sortLines(char** lines, int countOfStr)
 {
+    assert(lines != NULL);
+
     for (int index1 = 0; index1 < countOfStr; ++index1)
     {
         for (int index2 = countOfStr - 1; index2 > index1; --index2)
@@ -79,6 +81,8 @@ void sortLines(char** lines, int countOfStr)
 
 void writeTxtFile(char** lines, int countOfStr)
 {
+    assert(lines != NULL);
+
     FILE* fileOut = fopen("outputFile.txt", "w");
 
     if (fileOut == NULL)
@@ -120,6 +124,8 @@ int main()
     
     free(buffer);
     free(lines);
+
+    printf("SUCCESSFUL");
 
     return 0;
 }
