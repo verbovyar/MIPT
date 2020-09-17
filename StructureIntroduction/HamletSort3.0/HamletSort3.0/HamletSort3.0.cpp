@@ -3,9 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 int findFileSize(FILE* fileName)
 {
+    assert(fileName != NULL);
+
     fseek(fileName, 0, SEEK_END);
     const int sizeOfFile = ftell(fileName);
     fseek(fileName, 0, SEEK_SET);
@@ -15,9 +18,11 @@ int findFileSize(FILE* fileName)
 
 int findCountOfStr(char* buffer, int sizeOfFile)
 {
-    int countOfStr = 0;
+    assert(buffer != NULL);
 
-    for (int index = 0; index < sizeOfFile; ++index)
+    int countOfStr = 1;
+
+    for (int index = 0; index < sizeOfFile - 1; ++index)
     {
         if (buffer[index] == '\n')
         {
@@ -29,26 +34,33 @@ int findCountOfStr(char* buffer, int sizeOfFile)
     return countOfStr;
 }
 
-void makeLines(char* buffer, char* lines[], int sizeOfFile, int countOfStr)
+void makeLines(char* buffer, char** lines, int sizeOfFile, int countOfStr)
 {
-    lines[0] = &buffer[0];
+    assert(buffer != NULL);
+    assert(lines != NULL);
 
-    int lineIndex = 1;
-    for (int index = 0; index < sizeOfFile - 1; ++index)
+    lines[0] = &buffer[0];
+    int i = 0;
+    for (int indexOfLine = 1; indexOfLine < countOfStr; ++indexOfLine)
     {
-        if (buffer[index] == '\0')
+        while (buffer[i] != '\0')
         {
-            lines[lineIndex] = &buffer[index + 1];
-            ++lineIndex;
+            ++i;
+        }
+
+        if (buffer[i] == '\0')
+        {
+            lines[indexOfLine] = &buffer[i + 1];
+            ++i;
         }
     }
 }
 
-void sortLines(char* lines[], int countOfStr)
+void sortLines(char** lines, int countOfStr)
 {
     for (int index1 = 0; index1 < countOfStr; ++index1)
     {
-        for (int index2 = countOfStr - 1; index2 > index1; index2--)
+        for (int index2 = countOfStr - 1; index2 > index1; --index2)
         {
             int i = 0;
             while (*(lines[index2 - 1] + i) == *(lines[index2] + i))
@@ -56,7 +68,7 @@ void sortLines(char* lines[], int countOfStr)
                 ++i;
             }
 
-            if (*(lines[index2 - 1] + i) > * (lines[index2] + i))
+            if (*(lines[index2 - 1] + i) > *(lines[index2] + i))
             {
                 char* temp = lines[index2 - 1];
                 lines[index2 - 1] = lines[index2];
@@ -66,7 +78,7 @@ void sortLines(char* lines[], int countOfStr)
     }
 }
 
-void writeTxtFile(char* lines[], int countOfStr)
+void writeTxtFile(char** lines, int countOfStr)
 {
     FILE* fileout = fopen("output2.txt", "w");
 
@@ -95,7 +107,7 @@ int main()
     sortLines(lines, countOfStr);
 
     writeTxtFile(lines, countOfStr);
-
+    
     //free
 
     return 0;
