@@ -21,7 +21,6 @@ int findCountOfStr(char* buffer, int sizeOfFile)
     assert(buffer != NULL);
 
     int countOfStr = 1;
-
     for (int index = 0; index < sizeOfFile - 1; ++index)
     {
         if (buffer[index] == '\n')
@@ -80,19 +79,30 @@ void sortLines(char** lines, int countOfStr)
 
 void writeTxtFile(char** lines, int countOfStr)
 {
-    FILE* fileout = fopen("output2.txt", "w");
+    FILE* fileOut = fopen("outputFile.txt", "w");
+
+    if (fileOut == NULL)
+    {
+        printf("WRITING ERROR");
+    }
 
     for (int index = 0; index < countOfStr; ++index)
     {
-        fprintf(fileout, "%s\n", lines[index]);
+        fprintf(fileOut, "%s\n", lines[index]);
     }
 
-    fclose(fileout);
+    fclose(fileOut);
 }
 
 int main()
 {
     FILE* fileName = fopen("hamlet.txt", "r"); // add const value for TXT file 
+
+    if (fileName == NULL)
+    {
+        printf("READING ERROR!");
+        exit(0);
+    }
 
     const int sizeOfFile = findFileSize(fileName);
     char* buffer = (char*)calloc(sizeOfFile + 1, sizeof(char));
