@@ -208,7 +208,7 @@ int main()
 	}
 	else if (count == ONE)
 	{
-		printf("Root: %lf", x1);
+		printf("Roots: %lf", x1);
 	}
 	else
 	{
