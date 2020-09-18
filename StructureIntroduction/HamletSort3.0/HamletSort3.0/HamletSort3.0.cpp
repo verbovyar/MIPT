@@ -5,6 +5,51 @@
 #include <stdlib.h>
 #include <assert.h>
 
+int findFileSize(FILE* fileName);
+
+int findCountOfStr(char* buffer, int sizeOfFile);
+
+void makeLines(char* buffer, char** lines, int sizeOfFile, int countOfStr);
+
+void sortLines(char** lines, int countOfStr);
+
+void myStrCmp(char** lines, int countOfStr, int index2);
+
+void writeTxtFile(char** lines, int countOfStr);
+
+//
+int main()
+{
+    FILE* fileName = fopen("hamlet.txt", "r"); // add const value for TXT file 
+
+    if (fileName == NULL)
+    {
+        printf("READING ERROR!");
+        exit(0);
+    }
+
+    const int sizeOfFile = findFileSize(fileName);
+    char* buffer = (char*)calloc(sizeOfFile + 1, sizeof(char));
+    fread(buffer, sizeof(char), sizeOfFile, fileName);
+
+    fclose(fileName);
+
+    const int countOfStr = findCountOfStr(buffer, sizeOfFile);
+    char** lines = (char**)calloc(countOfStr + 1, sizeof(char*));
+    makeLines(buffer, lines, sizeOfFile, countOfStr);
+
+    sortLines(lines, countOfStr);
+
+    writeTxtFile(lines, countOfStr);
+    
+    free(buffer);
+    free(lines);
+
+    printf("SUCCESSFUL");
+
+    return 0;
+}
+
 int findFileSize(FILE* fileName)
 {
     assert(fileName != NULL);
@@ -63,19 +108,24 @@ void sortLines(char** lines, int countOfStr)
     {
         for (int index2 = countOfStr - 1; index2 > index1; --index2)
         {
-            int i = 0;
-            while (*(lines[index2 - 1] + i) == *(lines[index2] + i))
-            {
-                ++i;
-            }
-
-            if (*(lines[index2 - 1] + i) > *(lines[index2] + i))
-            {
-                char* temp = lines[index2 - 1];
-                lines[index2 - 1] = lines[index2];
-                lines[index2] = temp;
-            }
+            myStrCmp(lines, countOfStr, index2);
         }
+    }
+}
+
+void myStrCmp(char** lines, int countOfStr, int index2)
+{
+    int i = 0;
+    while (*(lines[index2 - 1] + i) == *(lines[index2] + i))
+    {
+        ++i;
+    }
+
+    if (*(lines[index2 - 1] + i) > * (lines[index2] + i))
+    {
+        char* temp = lines[index2 - 1];
+        lines[index2 - 1] = lines[index2];
+        lines[index2] = temp;
     }
 }
 
@@ -96,36 +146,4 @@ void writeTxtFile(char** lines, int countOfStr)
     }
 
     fclose(fileOut);
-}
-
-int main()
-{
-    FILE* fileName = fopen("hamlet.txt", "r"); // add const value for TXT file 
-
-    if (fileName == NULL)
-    {
-        printf("READING ERROR!");
-        exit(0);
-    }
-
-    const int sizeOfFile = findFileSize(fileName);
-    char* buffer = (char*)calloc(sizeOfFile + 1, sizeof(char));
-    fread(buffer, sizeof(char), sizeOfFile, fileName);
-
-    fclose(fileName);
-
-    const int countOfStr = findCountOfStr(buffer, sizeOfFile);
-    char** lines = (char**)calloc(countOfStr + 1, sizeof(char*));
-    makeLines(buffer, lines, sizeOfFile, countOfStr);
-
-    sortLines(lines, countOfStr);
-
-    writeTxtFile(lines, countOfStr);
-    
-    free(buffer);
-    free(lines);
-
-    printf("SUCCESSFUL");
-
-    return 0;
 }
