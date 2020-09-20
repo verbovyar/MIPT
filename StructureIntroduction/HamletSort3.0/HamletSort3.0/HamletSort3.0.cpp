@@ -9,17 +9,25 @@ int findFileSize(FILE* fileName);
 
 int findCountOfStr(char* buffer, int sizeOfFile);
 
-void makeLines(char* buffer, char** lines, int sizeOfFile, int countOfStr);
+void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr);
 
-void sortLines(char** lines, int countOfStr);
+void sortLines(char const** lines, int countOfStr);
 
-void myStrCmp(char** lines, int countOfStr, int index2);
+bool myStrCmp(char const** lines, int countOfStr, int index2);
 
-void writeTxtFile(char** lines, int countOfStr);
+void mySwap(char const** lines, int index2);
+
+void writeTxtFile(char const** lines, int countOfStr);
+
+void runUnitTests();
+
+void checkCorrect(bool value, int line);
 
 //
 int main()
 {
+    runUnitTests();
+
     FILE* fileName = fopen("hamlet.txt", "r"); // add const value for TXT file 
 
     if (fileName == NULL)
@@ -35,17 +43,17 @@ int main()
     fclose(fileName);
 
     const int countOfStr = findCountOfStr(buffer, sizeOfFile);
-    char** lines = (char**)calloc(countOfStr + 1, sizeof(char*));
+    char const** lines = (char const**)calloc(countOfStr + 1, sizeof(char*));
     makeLines(buffer, lines, sizeOfFile, countOfStr);
 
     sortLines(lines, countOfStr);
 
     writeTxtFile(lines, countOfStr);
-    
+
     free(buffer);
     free(lines);
 
-    printf("SUCCESSFUL");
+    printf("SUCCESSFUL ENDING");
 
     return 0;
 }
@@ -78,7 +86,7 @@ int findCountOfStr(char* buffer, int sizeOfFile)
     return countOfStr;
 }
 
-void makeLines(char* buffer, char** lines, int sizeOfFile, int countOfStr)
+void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
 {
     assert(buffer != NULL);
     assert(lines != NULL);
@@ -100,7 +108,7 @@ void makeLines(char* buffer, char** lines, int sizeOfFile, int countOfStr)
     }
 }
 
-void sortLines(char** lines, int countOfStr)
+void sortLines(char const** lines, int countOfStr)
 {
     assert(lines != NULL);
 
@@ -108,32 +116,44 @@ void sortLines(char** lines, int countOfStr)
     {
         for (int index2 = countOfStr - 1; index2 > index1; --index2)
         {
-            myStrCmp(lines, countOfStr, index2);
+            if (myStrCmp(lines, countOfStr, index2))
+            {
+                mySwap(lines, index2);
+            }
         }
     }
 }
 
-void myStrCmp(char** lines, int countOfStr, int index2)
+bool myStrCmp(char const** lines, int countOfStr, int index2)
 {
+    assert(lines != NULL);
+
     int i = 0;
     while (*(lines[index2 - 1] + i) == *(lines[index2] + i))
     {
         ++i;
     }
 
-    if (*(lines[index2 - 1] + i) > * (lines[index2] + i))
+    if (*(lines[index2 - 1] + i) > *(lines[index2] + i))
     {
-        char* temp = lines[index2 - 1];
-        lines[index2 - 1] = lines[index2];
-        lines[index2] = temp;
+        return true;
     }
 }
 
-void writeTxtFile(char** lines, int countOfStr)
+void mySwap(char const** lines, int index2)
 {
     assert(lines != NULL);
 
-    FILE* fileOut = fopen("outputFile.txt", "w");
+    char const* temp = lines[index2 - 1];
+    lines[index2 - 1] = lines[index2];
+    lines[index2] = temp;
+}
+
+void writeTxtFile(char const** lines, int countOfStr)
+{
+    assert(lines != NULL);
+
+    FILE* fileOut = fopen("sortHamlet.txt", "w");
 
     if (fileOut == NULL)
     {
@@ -146,4 +166,89 @@ void writeTxtFile(char** lines, int countOfStr)
     }
 
     fclose(fileOut);
+}
+
+//Testing
+void runUnitTests()
+{
+    //findFileSize
+    int count1 = NULL;
+    int count2 = NULL;
+
+    FILE* test1 = fopen("findFileSizeTest1.txt", "r");
+    FILE* test2 = fopen("findFileSizeTest2.txt", "r");
+
+    count1 = findFileSize(test1);
+    count2 = findFileSize(test2);
+
+    int realCount1 = 34;
+    int realCount2 = 35;
+
+    bool value1 = (realCount1 == count1);
+    bool value2 = (realCount2 == count2);
+    checkCorrect(value1, __LINE__);
+    checkCorrect(value2, __LINE__);
+
+    //findCountOfStr
+    test1 = fopen("findCountOfStrTest1.txt", "r");
+    test2 = fopen("findCountOfStrTest2.txt", "r");
+
+    int size1 = 34;
+    int size2 = 21;
+    char* text1 = (char*)calloc(size1 + 1, sizeof(char));
+    char* text2 = (char*)calloc(size2 + 1, sizeof(char));
+
+    fread(text1, sizeof(char), size1, test1);
+    fread(text2, sizeof(char), size2, test2);
+
+    fclose(test1);
+    fclose(test2);
+
+    count1 = findCountOfStr(text1, size1);
+    count2 = findCountOfStr(text2, size2);
+
+    realCount1 = 4;
+    realCount2 = 4;
+
+    value1 = (count1 == realCount1);
+    value2 = (count2 == realCount2);
+    checkCorrect(value1, __LINE__);
+    checkCorrect(value2, __LINE__);
+
+    free(text1);
+    free(text2);
+
+    //mySwap
+    char const* array1[] = { "hello", "world" };
+    char const* temp1 = array1[0];
+    char const* temp2 = array1[1];
+    int strCount = 2;
+    int strIndex = 1;
+
+    mySwap(array1, strIndex);
+
+    value1 = (array1[0] == temp2);
+    value2 = (array1[1] == temp1);
+    checkCorrect(value1, __LINE__);
+    checkCorrect(value2, __LINE__);
+
+    //myStrCmp
+    char const* arr[] = { "hello", "world" };
+    strCount = 2;
+    strIndex = 1;
+
+    bool value = myStrCmp(arr, strCount, strIndex);
+    checkCorrect(!value, __LINE__);
+}
+
+void checkCorrect(bool value, int line)
+{
+    if (value)
+    {
+        printf("CORRECT TEST\n");
+    }
+    else
+    {
+        printf("INCORRECT TEST: LINE %d\n", line);
+    }
 }
