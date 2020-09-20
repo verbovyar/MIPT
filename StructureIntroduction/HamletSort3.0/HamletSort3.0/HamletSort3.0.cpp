@@ -239,6 +239,8 @@ void runUnitTests()
 
     bool value = myStrCmp(arr, strCount, strIndex);
     checkCorrect(!value, __LINE__);
+
+    free(arr);
 }
 
 void checkCorrect(bool value, int line)
