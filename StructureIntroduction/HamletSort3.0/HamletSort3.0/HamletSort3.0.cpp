@@ -13,7 +13,7 @@ void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
 
 void sortLines(char const** lines, int countOfStr);
 
-bool myStrCmp(char const** lines, int countOfStr, int index2);
+void myStrCmp(char const** lines, int countOfStr, int index2);
 
 void mySwap(char const** lines, int index2);
 
@@ -116,15 +116,12 @@ void sortLines(char const** lines, int countOfStr)
     {
         for (int index2 = countOfStr - 1; index2 > index1; --index2)
         {
-            if (myStrCmp(lines, countOfStr, index2))
-            {
-                mySwap(lines, index2);
-            }
+            myStrCmp(lines, countOfStr, index2);
         }
     }
 }
 
-bool myStrCmp(char const** lines, int countOfStr, int index2)
+void myStrCmp(char const** lines, int countOfStr, int index2)
 {
     assert(lines != NULL);
 
@@ -134,9 +131,9 @@ bool myStrCmp(char const** lines, int countOfStr, int index2)
         ++i;
     }
 
-    if (*(lines[index2 - 1] + i) > *(lines[index2] + i))
+    if (*(lines[index2 - 1] + i) > * (lines[index2] + i))
     {
-        return true;
+        mySwap(lines, index2);
     }
 }
 
@@ -231,16 +228,6 @@ void runUnitTests()
     value2 = (array1[1] == temp1);
     checkCorrect(value1, __LINE__);
     checkCorrect(value2, __LINE__);
-
-    //myStrCmp
-    char const* arr[] = { "hello", "world" };
-    strCount = 2;
-    strIndex = 1;
-
-    bool value = myStrCmp(arr, strCount, strIndex);
-    checkCorrect(!value, __LINE__);
-
-    free(arr);
 }
 
 void checkCorrect(bool value, int line)
