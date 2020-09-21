@@ -19,7 +19,9 @@ void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
 
 void sortLines(char const** lines, int countOfStr);
 
-void myStrCmp(char const** lines, int countOfStr, int index2);
+void myStrCmp(void* point, int countOfStr, int index2);
+
+bool myIsAlpha(char symbol);
 
 void mySwap(char const** lines, int index2);
 
@@ -162,28 +164,40 @@ void sortLines(char const** lines, int countOfStr)
 //-------------------------
 //
 
-void myStrCmp(char const** lines, int countOfStr, int index2)
+void myStrCmp(void* point, int countOfStr, int index2)
 {
-    assert(lines != NULL);
+    assert(point != NULL);
 
     int i = 0;
-    while (*(lines[index2 - 1] + i) == *(lines[index2] + i))
+    char const** lines = (char const**)point; //type
+    while ((*(lines[index2 - 1] + i) == *(lines[index2] + i)) 
+        || !myIsAlpha(*(lines[index2 - 1] + i)) 
+        || !myIsAlpha(*(lines[index2] + i)))
     {
         ++i;
     }
 
-    if ((*(lines[index2 - 1] + i) > * (lines[index2] + i)) 
-        && ((*(lines[index2 - 1] + i) >= 'a'  
-        && *(lines[index2 - 1] + i) <= 'z' 
-        && *(lines[index2] + i) >= 'a'
-        && *(lines[index2] + i) <= 'z') 
-        ||
-        (*(lines[index2 - 1] + i) >= 'A'
-        && *(lines[index2 - 1] + i) <= 'Z'
-        && *(lines[index2] + i) >= 'A'
-        && *(lines[index2] + i) <= 'Z')))
+    if (*(lines[index2 - 1] + i) > * (lines[index2] + i))
     {
         mySwap(lines, index2);
+    }
+}
+
+//
+//-------------------------
+//check symbol to alpha
+//-------------------------
+//
+
+bool myIsAlpha(char symbol)
+{
+    if ((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z'))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
