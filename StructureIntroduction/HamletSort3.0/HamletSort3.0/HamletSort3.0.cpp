@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <assert.h>
 
+//
+//-------------------------
+//functions prototips
+//-------------------------
+//
+
 int findFileSize(FILE* fileName);
 
 int findCountOfStr(char* buffer, int sizeOfFile);
@@ -24,6 +30,11 @@ void runUnitTests();
 void checkCorrect(bool value, int line);
 
 //
+//-------------------------
+// main (add buffer and read file in one buffer)
+//-------------------------
+//
+
 int main()
 {
     runUnitTests();
@@ -58,6 +69,12 @@ int main()
     return 0;
 }
 
+//
+//-------------------------
+// function find size of input file
+//-------------------------
+//
+
 int findFileSize(FILE* fileName)
 {
     assert(fileName != NULL);
@@ -68,6 +85,12 @@ int findFileSize(FILE* fileName)
 
     return sizeOfFile;
 }
+
+//
+//-------------------------
+// find count of strings if input file
+//-------------------------
+//
 
 int findCountOfStr(char* buffer, int sizeOfFile)
 {
@@ -85,6 +108,12 @@ int findCountOfStr(char* buffer, int sizeOfFile)
 
     return countOfStr;
 }
+
+//
+//-------------------------
+// function make string (from buffer)
+//-------------------------
+//
 
 void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
 {
@@ -108,6 +137,12 @@ void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
     }
 }
 
+//
+//-------------------------
+// strings sortings
+//-------------------------
+//
+
 void sortLines(char const** lines, int countOfStr)
 {
     assert(lines != NULL);
@@ -120,6 +155,12 @@ void sortLines(char const** lines, int countOfStr)
         }
     }
 }
+
+//
+//-------------------------
+//string compare
+//-------------------------
+//
 
 void myStrCmp(char const** lines, int countOfStr, int index2)
 {
@@ -146,6 +187,12 @@ void myStrCmp(char const** lines, int countOfStr, int index2)
     }
 }
 
+//
+//-------------------------
+//change strings
+//-------------------------
+//
+
 void mySwap(char const** lines, int index2)
 {
     assert(lines != NULL);
@@ -154,6 +201,12 @@ void mySwap(char const** lines, int index2)
     lines[index2 - 1] = lines[index2];
     lines[index2] = temp;
 }
+
+//
+//-------------------------
+//write sort output file in txt
+//-------------------------
+//
 
 void writeTxtFile(char const** lines, int countOfStr)
 {
@@ -174,7 +227,12 @@ void writeTxtFile(char const** lines, int countOfStr)
     fclose(fileOut);
 }
 
-//Testing
+//
+//-------------------------
+//unit testing
+//-------------------------
+//
+
 void runUnitTests()
 {
     //findFileSize
@@ -225,19 +283,25 @@ void runUnitTests()
     free(text2);
 
     //mySwap
-    char const* array1[] = { "hello", "world" };
-    char const* temp1 = array1[0];
-    char const* temp2 = array1[1];
+    char const* array3[] = { "hello", "world" };
+    char const* temp1 = array3[0];
+    char const* temp2 = array3[1];
     int strCount = 2;
     int strIndex = 1;
 
-    mySwap(array1, strIndex);
+    mySwap(array3, strIndex);
 
-    value1 = (array1[0] == temp2);
-    value2 = (array1[1] == temp1);
+    value1 = (array3[0] == temp2);
+    value2 = (array3[1] == temp1);
     checkCorrect(value1, __LINE__);
     checkCorrect(value2, __LINE__);
 }
+
+//
+//-------------------------
+// check correct or incorrect unittest
+//-------------------------
+//
 
 void checkCorrect(bool value, int line)
 {
