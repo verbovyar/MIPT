@@ -131,7 +131,16 @@ void myStrCmp(char const** lines, int countOfStr, int index2)
         ++i;
     }
 
-    if (*(lines[index2 - 1] + i) > * (lines[index2] + i))
+    if ((*(lines[index2 - 1] + i) > * (lines[index2] + i)) 
+        && ((*(lines[index2 - 1] + i) >= 'a'  
+        && *(lines[index2 - 1] + i) <= 'z' 
+        && *(lines[index2] + i) >= 'a'
+        && *(lines[index2] + i) <= 'z') 
+        ||
+        (*(lines[index2 - 1] + i) >= 'A'
+        && *(lines[index2 - 1] + i) <= 'Z'
+        && *(lines[index2] + i) >= 'A'
+        && *(lines[index2] + i) <= 'Z')))
     {
         mySwap(lines, index2);
     }
