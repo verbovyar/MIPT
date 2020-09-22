@@ -17,13 +17,15 @@ int findCountOfStr(char* buffer, int sizeOfFile);
 
 void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr);
 
-void sortLines(char const** lines, int countOfStr);
+void sortLines(void* point, int countOfStr);
 
-void myStrCmp(void* point, int countOfStr, int index2);
+void isSymbols(void* point, int countOfStr, int index2);
+
+void myStrCmp(void* point, int index2, int k, int j);
 
 bool myIsAlpha(char symbol);
 
-void mySwap(char const** lines, int index2);
+void mySwap(void* point, int index2);
 
 void writeTxtFile(char const** lines, int countOfStr);
 
@@ -145,17 +147,46 @@ void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
 //-------------------------
 //
 
-void sortLines(char const** lines, int countOfStr)
+void sortLines(void* point, int countOfStr)
 {
-    assert(lines != NULL);
+    assert(point != NULL);
 
+    char const** lines = (char const**)point; //type
     for (int index1 = 0; index1 < countOfStr; ++index1)
     {
         for (int index2 = countOfStr - 1; index2 > index1; --index2)
         {
-            myStrCmp(lines, countOfStr, index2);
+            isSymbols(lines, countOfStr, index2);
         }
     }
+}
+
+//
+//-------------------------
+// find for the first differend letters
+//-------------------------
+//
+
+void isSymbols(void* point, int countOfStr, int index2)
+{
+    char const** lines = (char const**)point; //type
+    int i = 0;
+    while (*(lines[index2 - 1] + i) == *(lines[index2] + i))
+    {
+        ++i;
+    }
+    int k = i;
+    int j = i;
+    while (!myIsAlpha(*(lines[index2 - 1] + k)))
+    {
+        ++k;
+    }
+    while (!myIsAlpha(*(lines[index2] + j)))
+    {
+        ++j;
+    }
+
+    myStrCmp(lines, index2, k, j);
 }
 
 //
@@ -164,20 +195,12 @@ void sortLines(char const** lines, int countOfStr)
 //-------------------------
 //
 
-void myStrCmp(void* point, int countOfStr, int index2)
+void myStrCmp(void* point, int index2, int k, int j)
 {
     assert(point != NULL);
 
-    int i = 0;
     char const** lines = (char const**)point; //type
-    while ((*(lines[index2 - 1] + i) == *(lines[index2] + i)) 
-        || !myIsAlpha(*(lines[index2 - 1] + i)) 
-        || !myIsAlpha(*(lines[index2] + i)))
-    {
-        ++i;
-    }
-
-    if (*(lines[index2 - 1] + i) > * (lines[index2] + i))
+    if (*(lines[index2 - 1] + k) > *(lines[index2] + j))
     {
         mySwap(lines, index2);
     }
@@ -185,7 +208,7 @@ void myStrCmp(void* point, int countOfStr, int index2)
 
 //
 //-------------------------
-//check symbol to alpha
+//check symbol to alphabet
 //-------------------------
 //
 
@@ -207,10 +230,11 @@ bool myIsAlpha(char symbol)
 //-------------------------
 //
 
-void mySwap(char const** lines, int index2)
+void mySwap(void* point, int index2)
 {
-    assert(lines != NULL);
+    assert(point != NULL);
 
+    char const** lines = (char const**)point; //type
     char const* temp = lines[index2 - 1];
     lines[index2 - 1] = lines[index2];
     lines[index2] = temp;
