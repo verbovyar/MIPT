@@ -11,73 +11,75 @@ struct dynamicArray {
     int increaseFactor = 2;
 };
 
-void construct(struct dynamicArray* stack, int startSize)
+void construct(struct dynamicArray* arrayStack, int startSize)
 {
-    assert(stack != NULL);
+    assert(arrayStack != NULL);
 
-    stack->array = (int*)calloc(startSize, sizeof(int));
-    stack->capacity = startSize;
+    arrayStack->array = (int*)calloc(startSize, sizeof(int));
+    arrayStack->capacity = startSize;
 }
 
-void push(struct dynamicArray* stack, int value)
+void push(struct dynamicArray* arrayStack, int value)
 {
-    assert(stack != NULL);
+    assert(arrayStack != NULL);
 
-    if (stack->size == stack->capacity)
+    if (arrayStack->size == arrayStack->capacity)
     {
-        int* temp = (int*)realloc(stack->array, stack->capacity * stack->increaseFactor);
+        int* temp = (int*)realloc(arrayStack->array, arrayStack->capacity * arrayStack->increaseFactor);
         if (temp == NULL)
         {
             return;
         }
-        stack->array = temp; 
-        stack->capacity *= stack->increaseFactor;
+        arrayStack->array = temp; 
+        arrayStack->capacity *= arrayStack->increaseFactor;
 
         free(temp);
     }
 
-    stack->array[stack->size] = value;
-    ++stack->size;
+    arrayStack->array[arrayStack->size] = value;
+    ++arrayStack->size;
 }
 
-void pop(struct dynamicArray* stack)
+void pop(struct dynamicArray* arrayStack)
 {
-    assert(stack != NULL);
+    assert(arrayStack != NULL);
 
-    int index = stack->size - 1;
-    stack->array[index] = 0;
-    --stack->size;
+    int index = arrayStack->size - 1;
+    arrayStack->array[index] = 0;
+    --arrayStack->size;
 }
 
-int top(struct dynamicArray* stack)
+int top(struct dynamicArray* arrayStack)
 {
-    assert(stack != NULL);
+    assert(arrayStack != NULL);
 
-    int index = stack->size - 1;
-    return stack->array[index];
+    int index = arrayStack->size - 1;
+    return arrayStack->array[index];
 }
 
-void destroy(struct dynamicArray* stack)
+void destroy(struct dynamicArray* arrayStack)
 {
-    free(stack->array);
-    stack->size = 0;
-    stack->capacity = 0;
+    assert(arrayStack != 0);
+
+    free(arrayStack->array);
+    free(&arrayStack->size);
+    free(&arrayStack->capacity);
 }
  
 int main()
 {
-    dynamicArray stack;
-    construct(&stack, 10);
+    dynamicArray arrayStack;
+    construct(&arrayStack, 10);
 
     for (int i = 0; i < 12; ++i)
     {
-        push(&stack, 5);
+        push(&arrayStack, 5);
     }
 
-    int x = top(&stack);
-    pop(&stack);
+    int x = top(&arrayStack);
+    pop(&arrayStack);
 
-    printf("%d %d", stack.array[11], x);
+    printf("%d %d", arrayStack.array[11], x);
 
     return 0;
 }
