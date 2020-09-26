@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <sys/stat.h>
 
 //
 //-------------------------
@@ -11,7 +12,7 @@
 //-------------------------
 //
 
-int findFileSize(FILE* fileName);
+int getFileSize(FILE* fileName, char* txtname);
 
 int findCountOfStr(char* buffer, int sizeOfFile);
 
@@ -41,17 +42,19 @@ void checkCorrect(bool value, int line);
 
 int main()
 {
+    char fname[] = "hamlet.txt";
+
     runUnitTests();
 
-    FILE* fileName = fopen("hamlet.txt", "r"); // add const value for TXT file 
+    FILE* fileName = fopen(fname, "r"); // add const value for TXT file 
 
     if (fileName == NULL)
     {
         printf("READING ERROR!");
-        exit(0);
+        return -1;
     }
 
-    const int sizeOfFile = findFileSize(fileName);
+    const int sizeOfFile = getFileSize(fileName, fname);
     char* buffer = (char*)calloc(sizeOfFile + 1, sizeof(char));
     fread(buffer, sizeof(char), sizeOfFile, fileName);
 
@@ -79,15 +82,14 @@ int main()
 //-------------------------
 //
 
-int findFileSize(FILE* fileName)
+int getFileSize(FILE* fileName, char* txtname) // stat
 {
     assert(fileName != NULL);
 
-    fseek(fileName, 0, SEEK_END);
-    const int sizeOfFile = ftell(fileName);
-    fseek(fileName, 0, SEEK_SET);
+    struct stat fileStat;
+    stat(txtname, &fileStat);
 
-    return sizeOfFile;
+    return fileStat.st_size;
 }
 
 //
@@ -214,14 +216,9 @@ void myStrCmp(void* point, int index2, int k, int j)
 
 bool myIsAlpha(char symbol)
 {
-    if ((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z'))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    bool result = ((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z'));
+
+    return result;
 }
 
 //
@@ -273,15 +270,18 @@ void writeTxtFile(char const** lines, int countOfStr)
 
 void runUnitTests()
 {
-    //findFileSize
+    //getFileSize
     int count1 = NULL;
     int count2 = NULL;
 
     FILE* test1 = fopen("findFileSizeTest1.txt", "r");
     FILE* test2 = fopen("findFileSizeTest2.txt", "r");
 
-    count1 = findFileSize(test1);
-    count2 = findFileSize(test2);
+
+    char file1[] = "findFileSizeTest1.txt";
+    char file2[] = "findFileSizeTest2.txt";
+    count1 = getFileSize(test1, file1);
+    count2 = getFileSize(test2, file2);
 
     int realCount1 = 34;
     int realCount2 = 35;
