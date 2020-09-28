@@ -8,31 +8,45 @@
 
 //
 //-------------------------
+//struct for lines
+//-------------------------
+//
+
+struct Line {
+    char* string_ = NULL;
+    int len_ = 0;
+};
+
+//
+//-------------------------
 //functions prototips
 //-------------------------
 //
 
-int getFileSize(FILE* fileName, char* txtname);
+int getFileSize(FILE* fileName, char* file_name);
 
-int findCountOfStr(char* buffer, int sizeOfFile);
+int getLinesCount(char* buffer, int buffer_size);
 
-void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr);
+void convertToStringsArray(char* buffer, int file_size, int strings_count, Line* strings_array); 
 
-void sortLines(void* point, int countOfStr);
+void reverseSort(void* pointer, int strings_count);
 
-void isSymbols(void* point, int countOfStr, int index2);
+bool myStrReversCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position,
+                    int len1, int len2);
 
-void myStrCmp(void* point, int index2, int k, int j);
+void sortArray(void* pointer, int countOfStr);
 
-bool myIsAlpha(char symbol);
+bool myStrCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position);
 
-void mySwap(void* point, int index2);
+bool myIsAlphabet(char symbol);
 
-void writeTxtFile(char const** lines, int countOfStr);
+void mySwap(void* pointer, int index);
+
+void saveToTxtFile(Line* strings_array, int strings_count);
 
 void runUnitTests();
 
-void checkCorrect(bool value, int line);
+void printTestResult(bool value, int line);
 
 //
 //-------------------------
@@ -42,34 +56,35 @@ void checkCorrect(bool value, int line);
 
 int main()
 {
-    char fname[] = "hamlet.txt";
-
     runUnitTests();
 
-    FILE* fileName = fopen(fname, "r"); // add const value for TXT file 
+    FILE* file_descriptor = fopen("hamlet.txt", "r");
 
-    if (fileName == NULL)
+    if (file_descriptor == NULL)
     {
-        printf("READING ERROR!");
+        printf("\nREADING ERROR!");
         return -1;
     }
 
-    const int sizeOfFile = getFileSize(fileName, fname);
-    char* buffer = (char*)calloc(sizeOfFile + 1, sizeof(char));
-    fread(buffer, sizeof(char), sizeOfFile, fileName);
+    char file_name[] = "hamlet.txt";
+    int file_size = getFileSize(file_descriptor, file_name);
+    char* buffer = (char*)calloc(file_size + 1, sizeof(char));
+    file_size = fread(buffer, sizeof(char), file_size +1 , file_descriptor);
 
-    fclose(fileName);
+    fclose(file_descriptor);
 
-    const int countOfStr = findCountOfStr(buffer, sizeOfFile);
-    char const** lines = (char const**)calloc(countOfStr + 1, sizeof(char*));
-    makeLines(buffer, lines, sizeOfFile, countOfStr);
+    const int lines_count = getLinesCount(buffer, file_size);
+    Line* strings_array = (Line*)calloc(lines_count + 1, sizeof(Line));
+    convertToStringsArray(buffer, file_size, lines_count, strings_array);
 
-    sortLines(lines, countOfStr);
+    //reverseSort(strings_array, lines_count);
 
-    writeTxtFile(lines, countOfStr);
+    sortArray(strings_array, lines_count);
+
+    saveToTxtFile(strings_array, lines_count);
 
     free(buffer);
-    free(lines);
+    free(strings_array);
 
     printf("SUCCESSFUL ENDING");
 
@@ -82,12 +97,12 @@ int main()
 //-------------------------
 //
 
-int getFileSize(FILE* fileName, char* txtname) // stat
+int getFileSize(FILE* fileName, char* file_name) // stat
 {
     assert(fileName != NULL);
 
     struct stat fileStat;
-    stat(txtname, &fileStat);
+    stat(file_name, &fileStat);
 
     return fileStat.st_size;
 }
@@ -98,21 +113,20 @@ int getFileSize(FILE* fileName, char* txtname) // stat
 //-------------------------
 //
 
-int findCountOfStr(char* buffer, int sizeOfFile)
+int getLinesCount(char* buffer, int buffer_size)
 {
     assert(buffer != NULL);
 
-    int countOfStr = 1;
-    for (int index = 0; index < sizeOfFile - 1; ++index)
+    int lines_count = 1;
+    for (int index = 0; index < buffer_size; ++index)
     {
         if (buffer[index] == '\n')
         {
-            ++countOfStr;
+            ++lines_count;
             buffer[index] = '\0';
         }
     }
-
-    return countOfStr;
+    return lines_count;
 }
 
 //
@@ -121,26 +135,96 @@ int findCountOfStr(char* buffer, int sizeOfFile)
 //-------------------------
 //
 
-void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
+void convertToStringsArray(char* buffer, int file_size, int strings_count, Line* strings_array)
 {
     assert(buffer != NULL);
-    assert(lines != NULL);
+    assert(strings_array != NULL);
 
-    lines[0] = &buffer[0];
+    strings_array[0].string_ = buffer;
     int i = 0;
-    for (int indexOfLine = 1; indexOfLine < countOfStr; ++indexOfLine)
+    for (int indexOfLine = 1; indexOfLine <= strings_count; ++indexOfLine)
     {
+        int count = 0;
         while (buffer[i] != '\0')
         {
             ++i;
+            ++count;
         }
 
         if (buffer[i] == '\0')
         {
-            lines[indexOfLine] = &buffer[i + 1];
-            ++i;
+            strings_array[indexOfLine - 1].len_ = count;
+            if (indexOfLine < strings_count)
+            {
+                strings_array[indexOfLine].string_ = &buffer[i + 1];
+                ++i;
+            }
+            else 
+            {
+                break;
+            }
         }
     }
+}
+
+//
+//-------------------------
+// reversSort
+//-------------------------
+//
+
+void reverseSort(void* pointer, int strings_count)
+{
+    assert(pointer != NULL);
+    
+    Line* lines = (Line*)pointer; //type
+    for (int index1 = 0; index1 < strings_count; ++index1)
+    {
+        for (int index2 = strings_count - 1; index2 > index1; --index2)
+        {
+            int first_line_letter_position = 1;
+            while (!myIsAlphabet(*(lines[index2 - 1].string_ + lines[index2 - 1].len_ - first_line_letter_position)))
+            {
+                ++first_line_letter_position;
+            }
+
+            int second_line_letter_position = 1;
+            while (!myIsAlphabet(*(lines[index2].string_ + lines[index2].len_ - second_line_letter_position)))
+            {
+                ++second_line_letter_position;
+            }
+
+            int position = 0;
+            while (*(lines[index2 - 1].string_ + lines[index2 - 1].len_ - first_line_letter_position - position)
+                == *(lines[index2].string_ + lines[index2].len_ - second_line_letter_position - position))
+            {
+                ++position;
+            }
+
+            if (myStrReversCmp(lines, index2, first_line_letter_position, second_line_letter_position, 
+                position, lines[index2 - 1].len_, lines[index2].len_))
+            {
+                mySwap(lines, index2);
+            }
+        }
+    }
+}
+
+//
+//-------------------------
+// reversStrCmp
+//-------------------------
+//
+
+bool myStrReversCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position, 
+                    int len1, int len2)
+{
+    assert(pointer != NULL);
+
+    Line* lines = (Line*)pointer; //type
+
+    return (*(lines[index - 1].string_ + len1 - first_line_letter_position - position)
+    > *(lines[index].string_ + len2 - second_line_letter_position - position));
 }
 
 //
@@ -149,46 +233,40 @@ void makeLines(char* buffer, char const** lines, int sizeOfFile, int countOfStr)
 //-------------------------
 //
 
-void sortLines(void* point, int countOfStr)
+void sortArray(void* pointer, int strings_count)
 {
-    assert(point != NULL);
+    assert(pointer != NULL);
 
-    char const** lines = (char const**)point; //type
-    for (int index1 = 0; index1 < countOfStr; ++index1)
+    Line* lines = (Line*)pointer; //type
+    for (int index1 = 0; index1 < strings_count; ++index1)
     {
-        for (int index2 = countOfStr - 1; index2 > index1; --index2)
+        for (int index2 = strings_count - 1; index2 > index1; --index2)
         {
-            isSymbols(lines, countOfStr, index2);
+            int first_line_letter_position = 0;
+            while (!myIsAlphabet(*(lines[index2 - 1].string_ + first_line_letter_position)))
+            {
+                ++first_line_letter_position;
+            }
+
+            int second_line_letter_position = 0;
+            while (!myIsAlphabet(*(lines[index2].string_ + second_line_letter_position)))
+            {
+                ++second_line_letter_position;
+            }
+
+            int position = 0;
+            while (*(lines[index2 - 1].string_ + first_line_letter_position + position)
+                   == *(lines[index2].string_ + second_line_letter_position + position))
+            {
+                ++position;
+            }
+
+            if (myStrCmp(lines, index2, first_line_letter_position, second_line_letter_position, position))
+            {
+                mySwap(lines, index2);
+            }
         }
     }
-}
-
-//
-//-------------------------
-// find for the first differend letters
-//-------------------------
-//
-
-void isSymbols(void* point, int countOfStr, int index2)
-{
-    char const** lines = (char const**)point; //type
-    int i = 0;
-    while (*(lines[index2 - 1] + i) == *(lines[index2] + i))
-    {
-        ++i;
-    }
-    int k = i;
-    int j = i;
-    while (!myIsAlpha(*(lines[index2 - 1] + k)))
-    {
-        ++k;
-    }
-    while (!myIsAlpha(*(lines[index2] + j)))
-    {
-        ++j;
-    }
-
-    myStrCmp(lines, index2, k, j);
 }
 
 //
@@ -197,15 +275,14 @@ void isSymbols(void* point, int countOfStr, int index2)
 //-------------------------
 //
 
-void myStrCmp(void* point, int index2, int k, int j)
+bool myStrCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position)
 {
-    assert(point != NULL);
+    assert(pointer != NULL);
 
-    char const** lines = (char const**)point; //type
-    if (*(lines[index2 - 1] + k) > *(lines[index2] + j))
-    {
-        mySwap(lines, index2);
-    }
+    Line* lines = (Line*)pointer; //type
+
+    return (*(lines[index - 1].string_ + first_line_letter_position + position) 
+            > *(lines[index].string_ + second_line_letter_position + position));
 }
 
 //
@@ -214,11 +291,9 @@ void myStrCmp(void* point, int index2, int k, int j)
 //-------------------------
 //
 
-bool myIsAlpha(char symbol)
+bool myIsAlphabet(char symbol)
 {
-    bool result = ((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z'));
-
-    return result;
+    return ((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z'));
 }
 
 //
@@ -227,14 +302,14 @@ bool myIsAlpha(char symbol)
 //-------------------------
 //
 
-void mySwap(void* point, int index2)
+void mySwap(void* pointer, int index)
 {
-    assert(point != NULL);
+    assert(pointer != NULL);
 
-    char const** lines = (char const**)point; //type
-    char const* temp = lines[index2 - 1];
-    lines[index2 - 1] = lines[index2];
-    lines[index2] = temp;
+    Line* lines = (Line*)pointer; //type
+    Line temp = lines[index - 1];
+    lines[index - 1] = lines[index];
+    lines[index] = temp;
 }
 
 //
@@ -243,9 +318,9 @@ void mySwap(void* point, int index2)
 //-------------------------
 //
 
-void writeTxtFile(char const** lines, int countOfStr)
+void saveToTxtFile(Line* strings_array, int strings_count)
 {
-    assert(lines != NULL);
+    assert(strings_array != NULL);
 
     FILE* fileOut = fopen("sortHamlet.txt", "w");
 
@@ -254,9 +329,9 @@ void writeTxtFile(char const** lines, int countOfStr)
         printf("WRITING ERROR");
     }
 
-    for (int index = 0; index < countOfStr; ++index)
+    for (int index = 0; index < strings_count; ++index)
     {
-        fprintf(fileOut, "%s\n", lines[index]);
+        fprintf(fileOut, "%s\n", strings_array[index].string_);
     }
 
     fclose(fileOut);
@@ -288,10 +363,10 @@ void runUnitTests()
 
     bool value1 = (realCount1 == count1);
     bool value2 = (realCount2 == count2);
-    checkCorrect(value1, __LINE__);
-    checkCorrect(value2, __LINE__);
+    printTestResult(value1, __LINE__);
+    printTestResult(value2, __LINE__);
 
-    //findCountOfStr
+    //getLinesCount
     test1 = fopen("findCountOfStrTest1.txt", "r");
     test2 = fopen("findCountOfStrTest2.txt", "r");
 
@@ -306,33 +381,19 @@ void runUnitTests()
     fclose(test1);
     fclose(test2);
 
-    count1 = findCountOfStr(text1, size1);
-    count2 = findCountOfStr(text2, size2);
+    count1 = getLinesCount(text1, size1);
+    count2 = getLinesCount(text2, size2);
 
     realCount1 = 4;
     realCount2 = 4;
 
     value1 = (count1 == realCount1);
     value2 = (count2 == realCount2);
-    checkCorrect(value1, __LINE__);
-    checkCorrect(value2, __LINE__);
+    printTestResult(value1, __LINE__);
+    printTestResult(value2, __LINE__);
 
     free(text1);
     free(text2);
-
-    //mySwap
-    char const* array3[] = { "hello", "world" };
-    char const* temp1 = array3[0];
-    char const* temp2 = array3[1];
-    int strCount = 2;
-    int strIndex = 1;
-
-    mySwap(array3, strIndex);
-
-    value1 = (array3[0] == temp2);
-    value2 = (array3[1] == temp1);
-    checkCorrect(value1, __LINE__);
-    checkCorrect(value2, __LINE__);
 }
 
 //
@@ -341,7 +402,7 @@ void runUnitTests()
 //-------------------------
 //
 
-void checkCorrect(bool value, int line)
+void printTestResult(bool value, int line)
 {
     if (value)
     {
