@@ -14,39 +14,44 @@
 
 struct Line {
     char* string_ = NULL;
-    int len_ = 0;
+    size_t len_ = 0;
 };
 
+struct Text {
+    char* buffer_ = NULL;
+    size_t text_size_ = 0;
+    size_t lines_count = 0;
+    Line* lines_ = NULL;
+};
+
+enum ERROR_CODES {
+    NO_ERROR = 0,
+    READING_ERROR = 101
+};
+
+ERROR_CODES error_status = NO_ERROR;
+
 //
 //-------------------------
-//functions prototips
+//functions prototypes
 //-------------------------
 //
 
-int getFileSize(FILE* fileName, char* file_name);
-
-int getLinesCount(char* buffer, int buffer_size);
-
-void convertToStringsArray(char* buffer, int file_size, int strings_count, Line* strings_array); 
-
-void reverseSort(void* pointer, int strings_count);
-
-bool myStrReversCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position,
-                    int len1, int len2);
-
-void sortArray(void* pointer, int countOfStr);
-
-bool myStrCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position);
-
+Text readFileToBuffer(const char* file_name);
+size_t getFileSize(const char* file_name);
+size_t getLinesCount(char* buffer, size_t buffer_size);
+void textConstruct(Text* text); 
+void reverseSort(void* pointer, size_t strings_count);
+bool myStrReversCmp(void* pointer, size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position, size_t len1, size_t len2);        
+void sortArray(void* pointer, size_t countOfStr);
+bool myStrCmp(void* pointer,size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position);
 bool myIsAlphabet(char symbol);
-
-void mySwap(void* pointer, int index);
-
-void saveToTxtFile(Line* strings_array, int strings_count);
-
+void mySwap(void* pointer, size_t index);
+void sortHamletTxt(const char* file_name, Text text);
+void writeToTxtFile(Line* strings_array, size_t strings_count, FILE* fileout);
+void textDestruct(Text* text);
 void runUnitTests();
-
-void printTestResult(bool value, int line);
+void printTestResult(bool value, size_t line);
 
 //
 //-------------------------
@@ -56,39 +61,50 @@ void printTestResult(bool value, int line);
 
 int main()
 {
-    runUnitTests();
+    runUnitTests ();
 
-    FILE* file_descriptor = fopen("hamlet.txt", "r");
+    Text text = readFileToBuffer("hamlet.txt");
+    if (error_status == READING_ERROR) return READING_ERROR;
 
-    if (file_descriptor == NULL)
-    {
-        printf("\nREADING ERROR!");
-        return -1;
-    }
+    textConstruct(&text);
+        
+    sortHamletTxt("sortHamlet.txt", text);
 
-    char file_name[] = "hamlet.txt";
-    int file_size = getFileSize(file_descriptor, file_name);
-    char* buffer = (char*)calloc(file_size + 1, sizeof(char));
-    file_size = fread(buffer, sizeof(char), file_size +1 , file_descriptor);
-
-    fclose(file_descriptor);
-
-    const int lines_count = getLinesCount(buffer, file_size);
-    Line* strings_array = (Line*)calloc(lines_count + 1, sizeof(Line));
-    convertToStringsArray(buffer, file_size, lines_count, strings_array);
-
-    //reverseSort(strings_array, lines_count);
-
-    sortArray(strings_array, lines_count);
-
-    saveToTxtFile(strings_array, lines_count);
-
-    free(buffer);
-    free(strings_array);
-
+    textDestruct(&text);
+   
     printf("SUCCESSFUL ENDING");
 
     return 0;
+}
+
+//
+//-------------------------
+//read file into buffer
+//-------------------------
+//
+
+Text readFileToBuffer(const char* file_name)
+{
+    assert(file_name != NULL);
+
+    FILE* file_descriptor = fopen("hamlet.txt", "r");
+
+    if(file_descriptor == NULL)
+    {
+        printf("\nREADING ERROR!");
+        error_status = READING_ERROR;
+    }
+    
+    size_t file_size = getFileSize(file_name);
+    char* buffer = (char*)calloc(file_size + 1, sizeof(char));
+    assert(buffer != NULL);
+    file_size = fread(buffer, sizeof(char), file_size + 1, file_descriptor);
+
+    fclose(file_descriptor);
+
+    Text text_params = {buffer, file_size};
+
+    return text_params;
 }
 
 //
@@ -97,11 +113,11 @@ int main()
 //-------------------------
 //
 
-int getFileSize(FILE* fileName, char* file_name) // stat
+size_t getFileSize(const char* file_name) 
 {
-    assert(fileName != NULL);
+    assert(file_name != NULL);
 
-    struct stat fileStat;
+    struct stat fileStat = {};
     stat(file_name, &fileStat);
 
     return fileStat.st_size;
@@ -113,12 +129,12 @@ int getFileSize(FILE* fileName, char* file_name) // stat
 //-------------------------
 //
 
-int getLinesCount(char* buffer, int buffer_size)
+size_t getLinesCount(char* buffer, size_t buffer_size)
 {
     assert(buffer != NULL);
 
-    int lines_count = 1;
-    for (int index = 0; index < buffer_size; ++index)
+    size_t lines_count = 1;
+    for (size_t index = 0; index < buffer_size; ++index)
     {
         if (buffer[index] == '\n')
         {
@@ -135,28 +151,32 @@ int getLinesCount(char* buffer, int buffer_size)
 //-------------------------
 //
 
-void convertToStringsArray(char* buffer, int file_size, int strings_count, Line* strings_array)
+void textConstruct(Text* text)
 {
-    assert(buffer != NULL);
-    assert(strings_array != NULL);
+    assert(text != NULL);
 
-    strings_array[0].string_ = buffer;
-    int i = 0;
-    for (int indexOfLine = 1; indexOfLine <= strings_count; ++indexOfLine)
+    size_t lines_count = getLinesCount(text->buffer_, text->text_size_);
+    text->lines_ = (Line*)calloc(lines_count, sizeof(Text));
+    assert(text->lines_ != NULL);
+    text->lines_count = lines_count;
+    text->lines_[0].string_ = text->buffer_;
+    size_t i = 0;
+    size_t count = 0;
+    for (size_t indexOfLine = 1; indexOfLine <= lines_count; ++indexOfLine)
     {
-        int count = 0;
-        while (buffer[i] != '\0')
+        count = 0;
+        while (text->buffer_[i] != '\0')
         {
             ++i;
             ++count;
         }
 
-        if (buffer[i] == '\0')
+        if (text->buffer_[i] == '\0')
         {
-            strings_array[indexOfLine - 1].len_ = count;
-            if (indexOfLine < strings_count)
+            text->lines_[indexOfLine - 1].len_ = count;
+            if (indexOfLine < lines_count)
             {
-                strings_array[indexOfLine].string_ = &buffer[i + 1];
+                text->lines_[indexOfLine].string_ = &text->buffer_[i + 1];
                 ++i;
             }
             else 
@@ -173,28 +193,28 @@ void convertToStringsArray(char* buffer, int file_size, int strings_count, Line*
 //-------------------------
 //
 
-void reverseSort(void* pointer, int strings_count)
+void reverseSort(void* pointer, size_t strings_count)
 {
     assert(pointer != NULL);
     
-    Line* lines = (Line*)pointer; //type
-    for (int index1 = 0; index1 < strings_count; ++index1)
+    Line* lines = (Line*)pointer; 
+    for (size_t index1 = 0; index1 < strings_count; ++index1)
     {
-        for (int index2 = strings_count - 1; index2 > index1; --index2)
+        for (size_t index2 = strings_count - 1; index2 > index1; --index2)
         {
-            int first_line_letter_position = 1;
+            size_t first_line_letter_position = 1;
             while (!myIsAlphabet(*(lines[index2 - 1].string_ + lines[index2 - 1].len_ - first_line_letter_position)))
             {
                 ++first_line_letter_position;
             }
 
-            int second_line_letter_position = 1;
+            size_t second_line_letter_position = 1;
             while (!myIsAlphabet(*(lines[index2].string_ + lines[index2].len_ - second_line_letter_position)))
             {
                 ++second_line_letter_position;
             }
 
-            int position = 0;
+            size_t position = 0;
             while (*(lines[index2 - 1].string_ + lines[index2 - 1].len_ - first_line_letter_position - position)
                 == *(lines[index2].string_ + lines[index2].len_ - second_line_letter_position - position))
             {
@@ -216,12 +236,12 @@ void reverseSort(void* pointer, int strings_count)
 //-------------------------
 //
 
-bool myStrReversCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position, 
-                    int len1, int len2)
+bool myStrReversCmp(void* pointer, size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position, 
+                    size_t len1, size_t len2)
 {
     assert(pointer != NULL);
 
-    Line* lines = (Line*)pointer; //type
+    Line* lines = (Line*)pointer; 
 
     return (*(lines[index - 1].string_ + len1 - first_line_letter_position - position)
     > *(lines[index].string_ + len2 - second_line_letter_position - position));
@@ -233,28 +253,28 @@ bool myStrReversCmp(void* pointer, int index, int first_line_letter_position, in
 //-------------------------
 //
 
-void sortArray(void* pointer, int strings_count)
+void sortArray(void* pointer, size_t strings_count)
 {
     assert(pointer != NULL);
 
-    Line* lines = (Line*)pointer; //type
-    for (int index1 = 0; index1 < strings_count; ++index1)
+    Line* lines = (Line*)pointer; 
+    for (size_t index1 = 0; index1 < strings_count; ++index1)
     {
-        for (int index2 = strings_count - 1; index2 > index1; --index2)
+        for (size_t index2 = strings_count - 1; index2 > index1; --index2)
         {
-            int first_line_letter_position = 0;
+            size_t first_line_letter_position = 0;
             while (!myIsAlphabet(*(lines[index2 - 1].string_ + first_line_letter_position)))
             {
                 ++first_line_letter_position;
             }
 
-            int second_line_letter_position = 0;
+            size_t second_line_letter_position = 0;
             while (!myIsAlphabet(*(lines[index2].string_ + second_line_letter_position)))
             {
                 ++second_line_letter_position;
             }
 
-            int position = 0;
+            size_t position = 0;
             while (*(lines[index2 - 1].string_ + first_line_letter_position + position)
                    == *(lines[index2].string_ + second_line_letter_position + position))
             {
@@ -275,11 +295,11 @@ void sortArray(void* pointer, int strings_count)
 //-------------------------
 //
 
-bool myStrCmp(void* pointer, int index, int first_line_letter_position, int second_line_letter_position, int position)
+bool myStrCmp(void* pointer, size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position)
 {
     assert(pointer != NULL);
 
-    Line* lines = (Line*)pointer; //type
+    Line* lines = (Line*)pointer; 
 
     return (*(lines[index - 1].string_ + first_line_letter_position + position) 
             > *(lines[index].string_ + second_line_letter_position + position));
@@ -302,11 +322,11 @@ bool myIsAlphabet(char symbol)
 //-------------------------
 //
 
-void mySwap(void* pointer, int index)
+void mySwap(void* pointer, size_t index)
 {
     assert(pointer != NULL);
 
-    Line* lines = (Line*)pointer; //type
+    Line* lines = (Line*)pointer; 
     Line temp = lines[index - 1];
     lines[index - 1] = lines[index];
     lines[index] = temp;
@@ -318,11 +338,24 @@ void mySwap(void* pointer, int index)
 //-------------------------
 //
 
-void saveToTxtFile(Line* strings_array, int strings_count)
+void sortHamletTxt(const char* file_name, Text text)
+{
+    FILE* file_discriptor = fopen(file_name, "w");
+
+    reverseSort(text.lines_, text.lines_count);
+    writeToTxtFile(text.lines_, text.lines_count, file_discriptor);
+
+    sortArray(text.lines_, text.lines_count);
+    writeToTxtFile(text.lines_, text.lines_count, file_discriptor);
+
+    fclose(file_discriptor);
+}
+
+void writeToTxtFile(Line* strings_array, size_t strings_count, FILE* fileout)
 {
     assert(strings_array != NULL);
 
-    FILE* fileOut = fopen("sortHamlet.txt", "w");
+    FILE* fileOut = fopen("sortHamlet.txt", "a");
 
     if (fileOut == NULL)
     {
@@ -339,6 +372,24 @@ void saveToTxtFile(Line* strings_array, int strings_count)
 
 //
 //-------------------------
+//destroy file
+//-------------------------
+//
+
+void textDestruct(Text* text)
+{
+    assert(text != NULL);
+    assert(text->buffer_ != NULL);
+    assert(text->lines_ != NULL);
+
+    free(text->buffer_);
+    free(text->lines_);
+    text->lines_count = 0;
+    text->text_size_ = 0;
+}
+
+//
+//-------------------------
 //unit testing
 //-------------------------
 //
@@ -346,8 +397,8 @@ void saveToTxtFile(Line* strings_array, int strings_count)
 void runUnitTests()
 {
     //getFileSize
-    int count1 = NULL;
-    int count2 = NULL;
+    size_t count1 = NULL;
+    size_t count2 = NULL;
 
     FILE* test1 = fopen("findFileSizeTest1.txt", "r");
     FILE* test2 = fopen("findFileSizeTest2.txt", "r");
@@ -355,11 +406,11 @@ void runUnitTests()
 
     char file1[] = "findFileSizeTest1.txt";
     char file2[] = "findFileSizeTest2.txt";
-    count1 = getFileSize(test1, file1);
-    count2 = getFileSize(test2, file2);
+    count1 = getFileSize(file1);
+    count2 = getFileSize(file2);
 
-    int realCount1 = 34;
-    int realCount2 = 35;
+    size_t realCount1 = 34;
+    size_t realCount2 = 35;
 
     bool value1 = (realCount1 == count1);
     bool value2 = (realCount2 == count2);
@@ -370,8 +421,8 @@ void runUnitTests()
     test1 = fopen("findCountOfStrTest1.txt", "r");
     test2 = fopen("findCountOfStrTest2.txt", "r");
 
-    int size1 = 34;
-    int size2 = 21;
+    size_t size1 = 34;
+    size_t size2 = 21;
     char* text1 = (char*)calloc(size1 + 1, sizeof(char));
     char* text2 = (char*)calloc(size2 + 1, sizeof(char));
 
@@ -402,7 +453,7 @@ void runUnitTests()
 //-------------------------
 //
 
-void printTestResult(bool value, int line)
+void printTestResult(bool value, size_t line)
 {
     if (value)
     {
