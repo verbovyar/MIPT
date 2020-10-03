@@ -48,7 +48,7 @@ void sortArray(void* pointer, size_t countOfStr);
 bool myStrCmp(void* str1, void* str2);
 //
 bool myIsAlphabet(char symbol);
-void mySwap(void* pointer, size_t index);
+void mySwap(Line* str1, Line* str2);
 void sortHamletTxt(const char* file_name, Text text);
 void writeToTxtFile(Line* strings_array, size_t strings_count, FILE* fileout);
 void textDestruct(Text* text);
@@ -206,7 +206,7 @@ void reverseSort(void* pointer, size_t strings_count)
         {
             if (myStrReversCmp(lines[index2 - 1].string_, lines[index2].string_, lines[index2 - 1].len_, lines[index2].len_))
             {
-                mySwap(lines, index2); // error
+                mySwap(&lines[index2 - 1], &lines[index2]);
             }
         }
     }
@@ -266,7 +266,7 @@ void sortArray(void* pointer, size_t strings_count)
         {
             if (myStrCmp(lines[index2 - 1].string_, lines[index2].string_))
             {
-                mySwap(lines, index2);
+                mySwap(&lines[index2 - 1], &lines[index2]);
             }
         }
     }
@@ -326,14 +326,14 @@ bool myIsAlphabet(char symbol)
 //-------------------------
 //
 
-void mySwap(void* pointer, size_t index)
+void mySwap(Line* str1, Line* str2)
 {
-    assert(pointer != NULL);
+    assert(str1 != NULL);
+    assert(str2 != NULL);
 
-    Line* lines = (Line*)pointer; 
-    Line temp = lines[index - 1];
-    lines[index - 1] = lines[index];
-    lines[index] = temp;
+    Line temp = *str1;
+    *str1 = *str2;
+    *str2 = temp; 
 }
 
 //
