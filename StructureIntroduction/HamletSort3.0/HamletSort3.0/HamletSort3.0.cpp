@@ -41,10 +41,12 @@ Text readFileToBuffer(const char* file_name);
 size_t getFileSize(const char* file_name);
 size_t getLinesCount(char* buffer, size_t buffer_size);
 void textConstruct(Text* text); 
+//
 void reverseSort(void* pointer, size_t strings_count);
-bool myStrReversCmp(void* pointer, size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position, size_t len1, size_t len2);        
+bool myStrReversCmp(void* str1, void* str2, size_t len1, size_t len2); // DONE
 void sortArray(void* pointer, size_t countOfStr);
-bool myStrCmp(void* pointer,size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position);
+bool myStrCmp(void* str1, void* str2);
+//
 bool myIsAlphabet(char symbol);
 void mySwap(void* pointer, size_t index);
 void sortHamletTxt(const char* file_name, Text text);
@@ -202,29 +204,9 @@ void reverseSort(void* pointer, size_t strings_count)
     {
         for (size_t index2 = strings_count - 1; index2 > index1; --index2)
         {
-            size_t first_line_letter_position = 1;
-            while (!myIsAlphabet(*(lines[index2 - 1].string_ + lines[index2 - 1].len_ - first_line_letter_position)))
+            if (myStrReversCmp(lines[index2 - 1].string_, lines[index2].string_, lines[index2 - 1].len_, lines[index2].len_))
             {
-                ++first_line_letter_position;
-            }
-
-            size_t second_line_letter_position = 1;
-            while (!myIsAlphabet(*(lines[index2].string_ + lines[index2].len_ - second_line_letter_position)))
-            {
-                ++second_line_letter_position;
-            }
-
-            size_t position = 0;
-            while (*(lines[index2 - 1].string_ + lines[index2 - 1].len_ - first_line_letter_position - position)
-                == *(lines[index2].string_ + lines[index2].len_ - second_line_letter_position - position))
-            {
-                ++position;
-            }
-
-            if (myStrReversCmp(lines, index2, first_line_letter_position, second_line_letter_position, 
-                position, lines[index2 - 1].len_, lines[index2].len_))
-            {
-                mySwap(lines, index2);
+                mySwap(lines, index2); // error
             }
         }
     }
@@ -236,15 +218,35 @@ void reverseSort(void* pointer, size_t strings_count)
 //-------------------------
 //
 
-bool myStrReversCmp(void* pointer, size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position, 
-                    size_t len1, size_t len2)
+bool myStrReversCmp(void* str1, void* str2, size_t len1, size_t len2)
 {
-    assert(pointer != NULL);
+    assert(str1 != NULL);
+    assert(str2 != NULL);
 
-    Line* lines = (Line*)pointer; 
+    char* line1 = (char*)str1;
+    char* line2 = (char*)str2;
 
-    return (*(lines[index - 1].string_ + len1 - first_line_letter_position - position)
-    > *(lines[index].string_ + len2 - second_line_letter_position - position));
+    size_t first_line_letter_position = 1;
+    while (!myIsAlphabet(*(line1 + len1 - first_line_letter_position)))
+    {
+        ++first_line_letter_position;
+    }
+
+    size_t second_line_letter_position = 1;
+    while (!myIsAlphabet(*(line2 + len2 - second_line_letter_position)))
+    {
+        ++second_line_letter_position;
+    }
+
+    size_t position = 0;
+    while (*(line1 + len1 - first_line_letter_position - position)
+        == *(line2 + len2 - second_line_letter_position - position))
+    {
+        ++position;
+    }
+
+    return (*(line1 + len1 - first_line_letter_position - position)
+    > *(line2 + len2 - second_line_letter_position - position));
 }
 
 //
@@ -262,26 +264,7 @@ void sortArray(void* pointer, size_t strings_count)
     {
         for (size_t index2 = strings_count - 1; index2 > index1; --index2)
         {
-            size_t first_line_letter_position = 0;
-            while (!myIsAlphabet(*(lines[index2 - 1].string_ + first_line_letter_position)))
-            {
-                ++first_line_letter_position;
-            }
-
-            size_t second_line_letter_position = 0;
-            while (!myIsAlphabet(*(lines[index2].string_ + second_line_letter_position)))
-            {
-                ++second_line_letter_position;
-            }
-
-            size_t position = 0;
-            while (*(lines[index2 - 1].string_ + first_line_letter_position + position)
-                   == *(lines[index2].string_ + second_line_letter_position + position))
-            {
-                ++position;
-            }
-
-            if (myStrCmp(lines, index2, first_line_letter_position, second_line_letter_position, position))
+            if (myStrCmp(lines[index2 - 1].string_, lines[index2].string_))
             {
                 mySwap(lines, index2);
             }
@@ -295,14 +278,35 @@ void sortArray(void* pointer, size_t strings_count)
 //-------------------------
 //
 
-bool myStrCmp(void* pointer, size_t index, size_t first_line_letter_position, size_t second_line_letter_position, size_t position)
+bool myStrCmp(void* str1, void* str2)
 {
-    assert(pointer != NULL);
+    assert(str1 != NULL);
+    assert(str2 != NULL);
 
-    Line* lines = (Line*)pointer; 
+    char* line1 = (char*)str1;
+    char* line2 = (char*)str2;
 
-    return (*(lines[index - 1].string_ + first_line_letter_position + position) 
-            > *(lines[index].string_ + second_line_letter_position + position));
+    size_t first_line_letter_position = 0;
+    while (!myIsAlphabet(*(line1 + first_line_letter_position)))
+    {
+        ++first_line_letter_position;
+    }
+
+    size_t second_line_letter_position = 0;
+    while (!myIsAlphabet(*(line2 + second_line_letter_position)))
+    {
+        ++second_line_letter_position;
+    }
+
+    size_t position = 0;
+    while (*(line1 + first_line_letter_position + position)
+        == *(line2 + second_line_letter_position + position))
+    {
+        ++position;
+    }
+
+    return (*(line1 + first_line_letter_position + position) 
+            > *(line2 + second_line_letter_position + position));
 }
 
 //
