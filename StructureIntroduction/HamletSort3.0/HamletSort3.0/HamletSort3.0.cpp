@@ -41,12 +41,9 @@ Text readFileToBuffer(const char* file_name);
 size_t getFileSize(const char* file_name);
 size_t getLinesCount(char* buffer, size_t buffer_size);
 void textConstruct(Text* text); 
-//
-void reverseSort(void* pointer, size_t strings_count);
-bool myStrReversCmp(void* str1, void* str2, size_t len1, size_t len2); // DONE
-void sortArray(void* pointer, size_t countOfStr);
+bool myStrReversCmp(void* str1, void* str2);
 bool myStrCmp(void* str1, void* str2);
-//
+void myQsort(Line* pointer, int size, bool(*cmp)(void*, void*));
 bool myIsAlphabet(char symbol);
 void mySwap(Line* str1, Line* str2);
 void sortHamletTxt(const char* file_name, Text text);
@@ -191,62 +188,39 @@ void textConstruct(Text* text)
 
 //
 //-------------------------
-// reversSort
-//-------------------------
-//
-
-void reverseSort(void* pointer, size_t strings_count)
-{
-    assert(pointer != NULL);
-    
-    Line* lines = (Line*)pointer; 
-    for (size_t index1 = 0; index1 < strings_count; ++index1)
-    {
-        for (size_t index2 = strings_count - 1; index2 > index1; --index2)
-        {
-            if (myStrReversCmp(lines[index2 - 1].string_, lines[index2].string_, lines[index2 - 1].len_, lines[index2].len_))
-            {
-                mySwap(&lines[index2 - 1], &lines[index2]);
-            }
-        }
-    }
-}
-
-//
-//-------------------------
 // reversStrCmp
 //-------------------------
 //
 
-bool myStrReversCmp(void* str1, void* str2, size_t len1, size_t len2)
+bool myStrReversCmp(void* str1, void* str2)
 {
     assert(str1 != NULL);
     assert(str2 != NULL);
 
-    char* line1 = (char*)str1;
-    char* line2 = (char*)str2;
+    Line* line1 = (Line*)str1;
+    Line* line2 = (Line*)str2;
 
-    size_t first_line_letter_position = 1;
-    while (!myIsAlphabet(*(line1 + len1 - first_line_letter_position)))
+    size_t first_line_letter_position = 0;
+    while (!myIsAlphabet(*(line1->string_ + line1->len_ - first_line_letter_position)))
     {
         ++first_line_letter_position;
     }
 
-    size_t second_line_letter_position = 1;
-    while (!myIsAlphabet(*(line2 + len2 - second_line_letter_position)))
+    size_t second_line_letter_position = 0;
+    while (!myIsAlphabet(*(line2->string_ + line2->len_ - second_line_letter_position)))
     {
         ++second_line_letter_position;
     }
 
     size_t position = 0;
-    while (*(line1 + len1 - first_line_letter_position - position)
-        == *(line2 + len2 - second_line_letter_position - position))
+    while (*(line1->string_ + line1->len_ - first_line_letter_position - position)
+        == *(line2->string_ + line2->len_ - second_line_letter_position - position))
     {
         ++position;
     }
 
-    return (*(line1 + len1 - first_line_letter_position - position)
-    > *(line2 + len2 - second_line_letter_position - position));
+    return (*(line1->string_ + line1->len_ - first_line_letter_position - position)
+    > *(line2->string_ + line2->len_ - second_line_letter_position - position));
 }
 
 //
@@ -255,21 +229,48 @@ bool myStrReversCmp(void* str1, void* str2, size_t len1, size_t len2)
 //-------------------------
 //
 
-void sortArray(void* pointer, size_t strings_count)
+int partition(void* pointer, int size, bool(*cmp)(void*, void*))
+{
+    assert(pointer != NULL);
+    Line* lines = (Line*)pointer;
+    int i = 1;
+
+    for (int j = 1; j < size; ++j)
+    {
+        if (cmp(lines, lines + j))
+        {
+            mySwap(lines + i, lines + j);
+            ++i;
+        }
+    }
+    mySwap(lines + i - 1, lines);
+
+    return i - 1;
+}
+
+void myQsort(Line* pointer, int size, bool(*cmp)(void*, void*))
 {
     assert(pointer != NULL);
 
-    Line* lines = (Line*)pointer; 
-    for (size_t index1 = 0; index1 < strings_count; ++index1)
+    if (size <= 1)
     {
-        for (size_t index2 = strings_count - 1; index2 > index1; --index2)
+        return;
+    }
+    if (size == 2)
+    {
+        if (cmp(pointer, pointer + 1))
         {
-            if (myStrCmp(lines[index2 - 1].string_, lines[index2].string_))
-            {
-                mySwap(&lines[index2 - 1], &lines[index2]);
-            }
+            mySwap(pointer, pointer + 1);
+        }
+        else
+        {
+            return;
         }
     }
+    int position = partition(pointer, size, cmp);
+
+    myQsort(pointer, position, cmp);
+    myQsort(pointer + (position + 1), size - position - 1, cmp);
 }
 
 //
@@ -283,30 +284,31 @@ bool myStrCmp(void* str1, void* str2)
     assert(str1 != NULL);
     assert(str2 != NULL);
 
-    char* line1 = (char*)str1;
-    char* line2 = (char*)str2;
+    Line* line1 = (Line*)str1;
+    Line* line2 = (Line*)str2;
 
     size_t first_line_letter_position = 0;
-    while (!myIsAlphabet(*(line1 + first_line_letter_position)))
+    while (!myIsAlphabet(*(line1->string_ + first_line_letter_position)))
     {
         ++first_line_letter_position;
     }
 
     size_t second_line_letter_position = 0;
-    while (!myIsAlphabet(*(line2 + second_line_letter_position)))
+    while (!myIsAlphabet(*(line2->string_ + second_line_letter_position)))
     {
         ++second_line_letter_position;
     }
 
     size_t position = 0;
-    while (*(line1 + first_line_letter_position + position)
-        == *(line2 + second_line_letter_position + position))
+    while (*(line1->string_ + first_line_letter_position + position)
+        == *(line2->string_ + second_line_letter_position + position) 
+             && position < line1->len_ && position < line2->len_)
     {
         ++position;
     }
 
-    return (*(line1 + first_line_letter_position + position) 
-            > *(line2 + second_line_letter_position + position));
+    return (*(line1->string_ + first_line_letter_position + position) 
+            > *(line2->string_ + second_line_letter_position + position));
 }
 
 //
@@ -346,10 +348,10 @@ void sortHamletTxt(const char* file_name, Text text)
 {
     FILE* file_discriptor = fopen(file_name, "w");
 
-    reverseSort(text.lines_, text.lines_count);
+    myQsort(text.lines_, text.lines_count, myStrCmp);
     writeToTxtFile(text.lines_, text.lines_count, file_discriptor);
 
-    sortArray(text.lines_, text.lines_count);
+    myQsort(text.lines_, text.lines_count, myStrReversCmp);
     writeToTxtFile(text.lines_, text.lines_count, file_discriptor);
 
     fclose(file_discriptor);
