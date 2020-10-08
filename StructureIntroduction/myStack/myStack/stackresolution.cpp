@@ -1,223 +1,235 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <chrono>
 #include "mystack.h"
 
+typedef double elem_t;
+
+const uint32_t LEFT_CNRY = 0x212121;
+const uint32_t RIGHT_CNRY = 0x121212;
+const elem_t POISON_VALUE = 1e+308;
+
 struct myStack {
-    double* array_ = NULL;
-    int size_ = 0;
-    int capacity_ = 0;
-    double increase_factor_ = 2.5;
+  uint32_t left_cnry_ = 0;
+  uint32_t right_cnry_ = 0;
+
+  elem_t* array_ = NULL;
+  int size_ = 0;
+  int capacity_ = 0;
+  int increase_factor_ = 0; 
 };
 
-void construct(myStack* array_stack, size_t start_size)
-{
-    assert(array_stack != NULL);
+void construct(myStack* stack, size_t start_size) {
+  assert(stack != NULL);
 
-    array_stack->array_ = (double*)calloc(start_size, sizeof(double));
-    array_stack->capacity_ = start_size;
-    isOk(array_stack);
-    for (int i = 0; i < start_size; ++i)
-    {
-        array_stack->array_[i] = NAN;
-    }
+  stack->left_cnry_ = LEFT_CNRY;
+  stack->right_cnry_ = RIGHT_CNRY;
+  elem_t* temp = (elem_t*)calloc(1, 2 * sizeof(uint32_t) + start_size * sizeof(elem_t));
+  if (temp == NULL) {
+    return;
+  }
+  stack->array_ = temp;
+  *(uint32_t*)stack->array_ = LEFT_CNRY;
+  *(uint32_t*)(stack->array_ + sizeof(uint32_t) + start_size * sizeof(elem_t)) = RIGHT_CNRY;
+  stack->capacity_ = start_size;
+  stack->increase_factor_ = 2;
 
-    isOk(array_stack);
+  for (int i = 1; i <= start_size; ++i) {
+    stack->array_[i] = POISON_VALUE;
+  }
+
+  ASSERTOK(stack);
 }
 
-myStack* newStack(size_t start_size)
-{
-    myStack* array_stack = (myStack*)calloc(1, sizeof(myStack));
-    construct(array_stack, start_size);
+myStack* newStack(size_t start_size) {
+  myStack* stack = (myStack*)calloc(1, sizeof(myStack));
+  construct(stack, start_size);
 
-    return array_stack;
+  return stack;
 }
 
-void stackRealloc(myStack* array_stack)
-{
-    isOk(array_stack);
+void stackRealloc(myStack* stack) {
+  assert(stack != NULL);
+    
+  ASSERTOK(stack)
 
-    if (array_stack->size_ == array_stack->capacity_)
-    {
-        double* temp = (double*)realloc(array_stack->array_, array_stack->capacity_ * array_stack->increase_factor_ * sizeof(double));
-        if (temp == NULL)
-        {
-            return;
-        }
-
-        for (int i = array_stack->size_; i < array_stack->capacity_; ++i)
-        {
-            array_stack->array_[i] = NAN;
-        }
-        array_stack->array_ = temp;
-        array_stack->capacity_ *= array_stack->increase_factor_;
+  if (stack->size_ == stack->capacity_) {
+    elem_t* temp = (elem_t*)calloc(1, 2 * sizeof(uint32_t) + stack->capacity_ * stack->increase_factor_ * sizeof(elem_t));  
+    if (temp == NULL) {
+      return;
     }
 
-    isOk(array_stack);
+    free(stack->array_);
+    stack->array_ = temp;
+    *(uint32_t*)stack->array_ = LEFT_CNRY;
+    *(uint32_t*)(stack->array_ + sizeof(uint32_t) + (stack->capacity_ * stack->increase_factor_) * sizeof(elem_t)) = RIGHT_CNRY;
+    stack->capacity_ *= stack->increase_factor_; 
+    for (int i = stack->size_; i < stack->capacity_; ++i) {
+      stack->array_[i] = POISON_VALUE;
+    }
+  }
+
+  ASSERTOK(stack)
 }
 
-void shrinkToFit(myStack* array_stack)
-{
-    if (array_stack->size_ * 2 == array_stack->capacity_)
-    {
-        double* temp = (double*)realloc(array_stack->array_, array_stack->capacity_ / 2 * sizeof(double));
-        if (temp == NULL)
-        {
-            return;
-        }
+void shrinkToFit(myStack* stack) {
+  assert(stack != NULL);
 
-        array_stack->array_ = temp;
-        array_stack->capacity_ /= 2;
+  if (stack->size_ * stack->increase_factor_ + 1 == stack->capacity_) {
+    elem_t* temp = (elem_t*)calloc(1, 2 * sizeof(uint32_t) + stack->capacity_ / stack->increase_factor_ * sizeof(elem_t));
+    if (temp == NULL) {
+      return;
     }
+
+    *(uint32_t*)stack->array_ = LEFT_CNRY;
+    *(uint32_t*)(stack->array_ + sizeof(uint32_t) + (stack->capacity_ / stack->increase_factor_) * sizeof(elem_t)) = RIGHT_CNRY;
+    stack->array_ = temp;
+    stack->capacity_ /= stack->increase_factor_;
+  }
 }
 
-void push(myStack* array_stack, int value)
-{
-    isOk(array_stack);
+void push(myStack* stack, int value) {
+  assert(stack != NULL);
 
-    assert(array_stack != NULL);
+  ASSERTOK(stack)
 
-    stackRealloc(array_stack);
+  stackRealloc(stack);
 
-    array_stack->array_[array_stack->size_] = value;
-    ++array_stack->size_;
+  ++stack->size_;
+  stack->array_[stack->size_] = value;
 
-    isOk(array_stack);
+  ASSERTOK(stack)
 }
 
-void pop(myStack* array_stack)
-{
-    isOk(array_stack);
+void pop(myStack* stack) {
+  assert(stack != NULL);
 
-    assert(array_stack != NULL);
+  ASSERTOK(stack)
 
-    int index = array_stack->size_ - 1;
-    array_stack->array_[index] = NAN;
-    --array_stack->size_;
+  int index = stack->size_;
+  stack->array_[index] = POISON_VALUE;
+  --stack->size_;
 
-    isOk(array_stack);
+  ASSERTOK(stack)
 }
 
-double top(myStack* array_stack)
-{
-    assert(array_stack != NULL);
+elem_t top(myStack* stack) {
+  assert(stack != NULL);
 
-    isOk(array_stack);
+  ASSERTOK(stack)
 
-    int index = array_stack->size_ - 1;
+  int index = stack->size_;
 
-    isOk(array_stack);
+  ASSERTOK(stack)
 
-    return array_stack->array_[index];
+  return stack->array_[index];
 }
 
-void destroy(myStack* array_stack)
-{
-    isOk(array_stack);
+void destroy(myStack* stack) {
+  assert(stack != NULL);
 
-    assert(array_stack != NULL);
+  ASSERTOK(stack)
 
-    free(array_stack->array_);
-    array_stack->size_ = 0;
-    array_stack->capacity_ = 0;
+  free(stack->array_);
+  stack->size_ = 0;
+  stack->capacity_ = 0;
+  free(stack);
 
-    isOk(array_stack);
+  ASSERTOK(stack)
 }
 
-void clearStack(myStack* array_stack)
-{
-    isOk(array_stack);
+void clearStack(myStack* stack) {
+  assert(stack != NULL);
 
-    assert(array_stack != NULL);
+  ASSERTOK(stack)
 
-    for (int i = 0; i < array_stack->size_; ++i)
-    {
-        array_stack->array_[i] = NAN;
-    }
-    array_stack->array_ = NULL;
-    array_stack->capacity_ = 0;
-    array_stack->size_ = 0;
+  for (int i = 0; i < stack->size_; ++i) {
+    stack->array_[i] = POISON_VALUE;
+  }
+  stack->array_ = NULL;
+  stack->capacity_ = 0;
+  stack->size_ = 0;
+  stack = NULL;
 
-    isOk(array_stack);
+  ASSERTOK(stack)
 }
 
-void isOk(myStack* array_stack)
-{
-    if (array_stack == NULL)
-    {
-        stackDump(CONSTRUCT_ERROR, array_stack);
-        assert(!"OK");
-    }
+STACK_ERROR stackOk(myStack* stack) {
+  if (stack == NULL) {
+    return CONSTRUCT_ERROR;
+  }
 
-    if (array_stack->array_ == NULL)
-    {
-        stackDump(POINTER_ERROR, array_stack);
-        assert(!"OK");
-    }
+  if (stack->left_cnry_ != LEFT_CNRY || stack->right_cnry_ != RIGHT_CNRY)
+  {
+    return STRUCT_ERROR;
+  }
 
-    if (array_stack->size_ == -1)
-    {
-        stackDump(POP_ERROR, array_stack);
-        assert(!"OK");
-    }
+  if (stack->array_ == NULL) {
+    return POINTER_ERROR;    
+  }
 
-    if (array_stack->capacity_ < array_stack->size_)
-    {
-        stackDump(SIZE_ERROR, array_stack);
-        assert(!"OK");
-    }
+  if (stack->size_ == -1) {
+    return POP_ERROR;
+  }
 
-    if (array_stack->capacity_ < 0)
-    {
-        stackDump(STACK_POINTER_ERROR, array_stack);
-        assert(!"OK");
-    }
+  if (stack->capacity_ < stack->size_) {
+    return SIZE_ERROR;
+  }
+
+  if (stack->capacity_ < 0) {
+    return STACK_POINTER_ERROR;
+  }
+
+  return NO_ERROR;
 }
 
-void stackDump(STACK_ERROR ERROR, myStack* array_stack)
-{
-    switch (ERROR)
-    {
-    case(SIZE_ERROR):
-    {
-        printf("Out of array!\n");
-        printf("Capacity:%d\n", array_stack->capacity_);
-        printf("Size:%d\n", array_stack->size_);
+void stackDump(myStack* stack) {
+  FILE* log_file = fopen("logfile.txt", "w");
+  STACK_ERROR ERROR = stackOk(stack);
+  switch (ERROR) {
 
-        break;
-    }
-    case(STACK_POINTER_ERROR):
-    {
-        printf("Stack array error!\n");
-        printf("Capacity:%d\n", array_stack->capacity_);
-        printf("Size:%d\n", array_stack->size_);
+    case (SIZE_ERROR): {
+      fprintf(log_file,"Out of array!\n");
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
 
-        break;
+      break;
     }
-    case(POINTER_ERROR):
-    {
-        printf("Memory array stack error!\n");
-        printf("Pointer is NULL:%d\n", array_stack->array_);
-        printf("Capacity:%d\n", array_stack->capacity_);
+    case (STACK_POINTER_ERROR): {
+      fprintf(log_file, "Stack array error!\n");
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
 
-        break;
+      break;
     }
-    case(POP_ERROR):
-    {
-        printf("Stack is empty, you cant pop element!\n");
-        printf("Stack size:%d\n", array_stack->size_);
+    case (POINTER_ERROR): {
+      fprintf(log_file, "Memory array stack error!\n");
+      fprintf(log_file, "Pointer is NULL:%p\n", stack->array_);
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
 
-        break;
+      break;
     }
-    case(CONSTRUCT_ERROR):
-    {
-        printf("Stack construct error!\n");
-        printf("Pointer is NULL:%d\n", array_stack);
+    case (POP_ERROR): {
+      fprintf(log_file, "Stack is empty, you cant pop element!\n");
+      fprintf(log_file, "Stack size:%d\n", stack->size_);
 
-        break;
+      break;
     }
+    case (CONSTRUCT_ERROR): {
+      fprintf(log_file, "Stack construct error!\n");
+      fprintf(log_file, "Pointer is NULL:%p\n", stack);
+
+      break;
     }
+    case (STRUCT_ERROR): {
+      fprintf(log_file, "You cant to change struct(stack)!\n");
+      fprintf(log_file, "Right CNRY:%u \n",stack->right_cnry_);
+      fprintf(log_file, "Real CNRY:%u", RIGHT_CNRY);
+      fprintf(log_file, "Left CNRY:%u \n", stack->left_cnry_);
+      fprintf(log_file, "Real CNRY:%u", LEFT_CNRY);
+
+      break;
+    }
+  }
+
+  fclose(log_file);
 }

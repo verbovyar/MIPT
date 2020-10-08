@@ -2,15 +2,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-#include <chrono>
+
 #include "mystack.h"
 
-int main()
-{
-    myStack* table = newStack(5);
+int main() {
+  myStack* stck = newStack(3);
+  for (int i = 0; i < 5; ++i) {
+    push(stck, 10);
+  }
+  push(stck, 7);
+  printf("%lf", top(stck));
 
-    return 0;
+  return 0;
 }
 
 
