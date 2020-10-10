@@ -4,32 +4,56 @@
 
 typedef double elem_t;
 
-const uint32_t LEFT_CNRY = 0x212121;
-const uint32_t RIGHT_CNRY = 0x121212;
+const elem_t LEFT_CNRY = 0x212121;
+const elem_t RIGHT_CNRY = 0x121212;
 const elem_t POISON_VALUE = 1e+308;
 
 struct myStack {
-  uint32_t left_cnry_ = 0;
-  uint32_t right_cnry_ = 0;
+
+  #ifdef STACK_DEBUG
+  int hash_summ = 0;
+  #endif
+  
+  #ifdef STACK_DEBAG
+  elem_t left_cnry_ = 0;
+  #endif
 
   elem_t* array_ = NULL;
   int size_ = 0;
   int capacity_ = 0;
   int increase_factor_ = 0; 
+
+  #ifdef STACK_DEBAG
+  elem_t right_cnry_ = 0;
+  #endif
 };
 
 void construct(myStack* stack, size_t start_size) {
   assert(stack != NULL);
 
+  #ifdef STACK_DEBUG
   stack->left_cnry_ = LEFT_CNRY;
   stack->right_cnry_ = RIGHT_CNRY;
-  elem_t* temp = (elem_t*)calloc(1, 2 * sizeof(uint32_t) + start_size * sizeof(elem_t));
+
+  elem_t* temp = (elem_t*)calloc(1, (2 + start_size) * sizeof(elem_t));
   if (temp == NULL) {
     return;
   }
+  *(elem_t*)stack->array_ = LEFT_CNRY;
+  *(elem_t*)(stack->array_ + sizeof(elem_t) + start_size * sizeof(elem_t)) = RIGHT_CNRY;
+  
+  stack->hash_summ = stackHash(stack);
+    
+  #else
+
+  elem_t* temp = (elem_t*)calloc(1, start_size * sizeof(elem_t));
+  if (temp == NULL) {
+    return;
+  }
+
+  #endif
+
   stack->array_ = temp;
-  *(uint32_t*)stack->array_ = LEFT_CNRY;
-  *(uint32_t*)(stack->array_ + sizeof(uint32_t) + start_size * sizeof(elem_t)) = RIGHT_CNRY;
   stack->capacity_ = start_size;
   stack->increase_factor_ = 2;
 
@@ -47,21 +71,33 @@ myStack* newStack(size_t start_size) {
   return stack;
 }
 
-void stackRealloc(myStack* stack) {
+void stackNewSize(myStack* stack) {
   assert(stack != NULL);
     
   ASSERTOK(stack)
 
   if (stack->size_ == stack->capacity_) {
-    elem_t* temp = (elem_t*)calloc(1, 2 * sizeof(uint32_t) + stack->capacity_ * stack->increase_factor_ * sizeof(elem_t));  
+
+    #ifdef STACK_DEBUG
+    elem_t* temp = (elem_t*)calloc(1, (stack->capacity_ + 2) * stack->increase_factor_ * sizeof(elem_t));  
     if (temp == NULL) {
       return;
     }
 
     free(stack->array_);
+    *(elem_t*)stack->array_ = LEFT_CNRY;
+    *(elem_t*)(stack->array_ + sizeof(elem_t) + (stack->capacity_ * stack->increase_factor_) * sizeof(elem_t)) = RIGHT_CNRY;
+
+    stack->hash_summ = stackHash(stack);
+    #else
+
+    elem_t* temp = (elem_t*)calloc(1, stack->capacity_ * stack->increase_factor_ * sizeof(elem_t));
+    if (temp == NULL) {
+      return;
+    }
+    #endif
+
     stack->array_ = temp;
-    *(uint32_t*)stack->array_ = LEFT_CNRY;
-    *(uint32_t*)(stack->array_ + sizeof(uint32_t) + (stack->capacity_ * stack->increase_factor_) * sizeof(elem_t)) = RIGHT_CNRY;
     stack->capacity_ *= stack->increase_factor_; 
     for (int i = stack->size_; i < stack->capacity_; ++i) {
       stack->array_[i] = POISON_VALUE;
@@ -74,17 +110,25 @@ void stackRealloc(myStack* stack) {
 void shrinkToFit(myStack* stack) {
   assert(stack != NULL);
 
+  #ifdef STACK_DEBUG
   if (stack->size_ * stack->increase_factor_ + 1 == stack->capacity_) {
-    elem_t* temp = (elem_t*)calloc(1, 2 * sizeof(uint32_t) + stack->capacity_ / stack->increase_factor_ * sizeof(elem_t));
+    elem_t* temp = (elem_t*)calloc(1, (2 + stack->capacity_) / stack->increase_factor_ * sizeof(elem_t));
     if (temp == NULL) {
       return;
     }
 
-    *(uint32_t*)stack->array_ = LEFT_CNRY;
-    *(uint32_t*)(stack->array_ + sizeof(uint32_t) + (stack->capacity_ / stack->increase_factor_) * sizeof(elem_t)) = RIGHT_CNRY;
+    *(elem_t*)stack->array_ = LEFT_CNRY;
+    *(elem_t*)(stack->array_ + sizeof(elem_t) + (stack->capacity_ / stack->increase_factor_) * sizeof(elem_t)) = RIGHT_CNRY;
+
+    stack->hash_summ = stackHash(stack);
+    #else
+  elem_t* temp = (elem_t*)calloc(1, stack->capacity_ / stack->increase_factor_ * sizeof(elem_t));
+  if (temp == NULL) {
+    return;
+  }
+  #endif
     stack->array_ = temp;
     stack->capacity_ /= stack->increase_factor_;
-  }
 }
 
 void push(myStack* stack, int value) {
@@ -92,22 +136,29 @@ void push(myStack* stack, int value) {
 
   ASSERTOK(stack)
 
-  stackRealloc(stack);
+  stackNewSize(stack);
 
   ++stack->size_;
   stack->array_[stack->size_] = value;
 
+  #ifdef DEBUG
+  stack->hash_summ = stackHash(stack);
+  #endif
+
   ASSERTOK(stack)
 }
 
-void pop(myStack* stack) {
+void pop(myStack * stack) {
   assert(stack != NULL);
 
   ASSERTOK(stack)
 
-  int index = stack->size_;
-  stack->array_[index] = POISON_VALUE;
+  stack->array_[stack->size_] = POISON_VALUE;
   --stack->size_;
+
+  #ifdef DEBUG
+  stack->hash_summ = stackHash(stack);
+  #endif
 
   ASSERTOK(stack)
 }
@@ -117,14 +168,18 @@ elem_t top(myStack* stack) {
 
   ASSERTOK(stack)
 
-  int index = stack->size_;
+  elem_t value = stack->array_[stack->size_];
 
   ASSERTOK(stack)
 
-  return stack->array_[index];
+  #ifdef DEBUG
+  stack->hash_summ = stackHash(stack);
+  #endif
+
+  return value;
 }
 
-void destroy(myStack* stack) {
+void deleteStack(myStack* stack) {
   assert(stack != NULL);
 
   ASSERTOK(stack)
@@ -133,6 +188,10 @@ void destroy(myStack* stack) {
   stack->size_ = 0;
   stack->capacity_ = 0;
   free(stack);
+
+  #ifdef DEBUG
+  stack->hash_summ = stackHash(stack);
+  #endif
 
   ASSERTOK(stack)
 }
@@ -150,7 +209,25 @@ void clearStack(myStack* stack) {
   stack->size_ = 0;
   stack = NULL;
 
+  #ifdef DEBUG
+  stack->hash_summ = stackHash(stack);
+  #endif
+
   ASSERTOK(stack)
+}
+
+int stackHash(myStack * stack) { 
+    int hash_summ = 0;
+
+    const char* temp = (const char*)stack;
+    uint32_t size = 3 * sizeof(int) + sizeof(elem_t);
+    for (int i = 0; i < size; i += 4) {
+      int bit = temp[i];
+      bit = (bit << 1) + ((bit >> 31) & 1);
+      hash_summ = bit ^ hash_summ;
+    }
+
+    return hash_summ;
 }
 
 STACK_ERROR stackOk(myStack* stack) {
@@ -158,10 +235,23 @@ STACK_ERROR stackOk(myStack* stack) {
     return CONSTRUCT_ERROR;
   }
 
-  if (stack->left_cnry_ != LEFT_CNRY || stack->right_cnry_ != RIGHT_CNRY)
-  {
+  #ifdef STACK_DEBUG 
+  if (stack->left_cnry_ != LEFT_CNRY || stack->right_cnry_ != RIGHT_CNRY) {
     return STRUCT_ERROR;
   }
+  #endif
+
+  #ifdef STACK_DEBUG 
+  if (stack->hash_summ != stackHash(stack)) {
+    return HASH_ERROR;
+  }
+  #endif
+
+  #ifdef STACK_DEBUG
+  if (stack->array_[0] != LEFT_CNRY || stack->array_[stack->capacity + 1] != RIGHT_CNRY) {
+    return ARRAY_ERROR;
+  }
+#endif
 
   if (stack->array_ == NULL) {
     return POINTER_ERROR;    
@@ -220,6 +310,14 @@ void stackDump(myStack* stack) {
 
       break;
     }
+
+    #ifdef STACK_DEBUG
+    case (HASH_ERROR): {
+      fprintf(log_file, "Hash_error, you cant to change buffer!");
+    }
+    #endif
+    
+    #ifdef STACK_DEBUG
     case (STRUCT_ERROR): {
       fprintf(log_file, "You cant to change struct(stack)!\n");
       fprintf(log_file, "Right CNRY:%u \n",stack->right_cnry_);
@@ -229,6 +327,17 @@ void stackDump(myStack* stack) {
 
       break;
     }
+    #endif
+    
+    #ifdef STACK_DEBUG
+    case (ARRAY_ERROR): {
+      fprintf(log_file, "You cant to change array(stack)!\n");
+      fprintf(log_file, "Right CNRY:%u \n", stack->array_[0]);
+      fprintf(log_file, "Real CNRY:%u", RIGHT_CNRY);
+      fprintf(log_file, "Left CNRY:%u \n", stack->array_[stack->capacity_ + 1]);
+      fprintf(log_file, "Real CNRY:%u", LEFT_CNRY);
+    }
+    #endif
   }
 
   fclose(log_file);

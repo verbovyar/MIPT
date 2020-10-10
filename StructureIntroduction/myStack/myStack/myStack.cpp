@@ -11,6 +11,8 @@ int main() {
     push(stck, 10);
   }
   push(stck, 7);
+  printf("%lf\n", top(stck));
+  pop(stck);
   printf("%lf", top(stck));
 
   return 0;

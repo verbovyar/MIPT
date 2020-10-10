@@ -13,7 +13,7 @@ struct myStack;
 void shrinkToFit(myStack* stack);
 void push(myStack* stack, int value);
 void pop(myStack* stack);
-void destroy(myStack* stack);
+void deleteStack(myStack* stack);
 void clearStack(myStack* stack);
 double top(myStack* stack);
 myStack* newStack(size_t start_size);
@@ -33,13 +33,15 @@ myStack* newStack(size_t start_size);
 //------
 
 enum STACK_ERROR {
-  SIZE_ERROR =          101,
-  POINTER_ERROR =       202,
-  POP_ERROR =           303,
+  SIZE_ERROR = 101,
+  POINTER_ERROR = 202,
+  POP_ERROR = 303,
   STACK_POINTER_ERROR = 404,
-  CONSTRUCT_ERROR =     505,
-  STRUCT_ERROR =        606,
-  NO_ERROR =			0
+  CONSTRUCT_ERROR = 505,
+  STRUCT_ERROR = 606,
+  ARRAY_ERROR = 707,
+  HASH_ERROR = 808,
+  NO_ERROR = 0
 };
 void stackDump(myStack* stack);
 STACK_ERROR stackOk(myStack* stack);
