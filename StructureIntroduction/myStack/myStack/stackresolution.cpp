@@ -2,12 +2,9 @@
 
 #include "mystack.h"
 
-
-
 const elem_t LEFT_CNRY = 0x212121;
 const elem_t RIGHT_CNRY = 0x121212;
 const elem_t POISON_VALUE = 1e+308;
-
 
 #ifdef STACK_DEBUG
 uint64_t stackHash(myStack* stack) {
@@ -51,8 +48,7 @@ void construct(myStack* stack, size_t start_size) {
   }
   stack->array_ = temp;
   *(elem_t*)stack->array_ = LEFT_CNRY;
-  *((elem_t*)stack->array_ + 1 + start_size * 1) =
-      RIGHT_CNRY;
+  *((elem_t*)stack->array_ + 1 + start_size * 1) = RIGHT_CNRY;
 
 #else
 
@@ -66,7 +62,6 @@ void construct(myStack* stack, size_t start_size) {
   stack->array_ = temp;
   stack->capacity_ = start_size;
   stack->increase_factor_ = 2;
-  printf("%llu\n", stack->array_[stack->capacity_ + 1]);
 
   for (int i = 1; i <= start_size; ++i) {
     stack->array_[i] = POISON_VALUE;
@@ -89,8 +84,7 @@ void stackNewSize(myStack* stack) {
 
   if (stack->size_ == stack->capacity_) {
 #ifdef STACK_DEBUG
-    elem_t* temp = (elem_t*)calloc(
-        1, (stack->capacity_ * stack->increase_factor_ + 2) * sizeof(elem_t));
+    elem_t* temp = (elem_t*)calloc(1, (stack->capacity_ * stack->increase_factor_ + 2) * sizeof(elem_t));
     if (temp == NULL) {
       return;
     }
@@ -98,14 +92,11 @@ void stackNewSize(myStack* stack) {
     free(stack->array_);
     stack->array_ = temp;
     *(elem_t*)stack->array_ = LEFT_CNRY;
-    *((elem_t*)stack->array_ + 
-               (stack->capacity_ * stack->increase_factor_ + 1) * 1) =
-        RIGHT_CNRY;
+    *((elem_t*)stack->array_ + (stack->capacity_ * stack->increase_factor_ + 1) * 1) = RIGHT_CNRY;
 
 #else
 
-    elem_t* temp = (elem_t*)calloc(
-        1, stack->capacity_ * stack->increase_factor_ * 1);
+    elem_t* temp = (elem_t*)calloc(1, stack->capacity_ * stack->increase_factor_ * 1);
     if (temp == NULL) {
       return;
     }
@@ -136,15 +127,13 @@ void shrinkToFit(myStack* stack) {
     stack->capacity_ /= stack->increase_factor_;
 
     *(elem_t*)stack->array_ = LEFT_CNRY;
-    *(elem_t*)(stack->array_ + sizeof(elem_t) +
-               (stack->capacity_ / stack->increase_factor_) * sizeof(elem_t)) =
+    *(elem_t*)(stack->array_ + sizeof(elem_t) + (stack->capacity_ / stack->increase_factor_) * sizeof(elem_t)) =
         RIGHT_CNRY;
 
     stack->hash_summ = stackHash(stack);
   }
 #else
-  elem_t* temp = (elem_t*)calloc(
-      1, stack->capacity_ / stack->increase_factor_ * sizeof(elem_t));
+  elem_t* temp = (elem_t*)calloc(1, stack->capacity_ / stack->increase_factor_ * sizeof(elem_t));
   if (temp == NULL) {
     return;
   }
@@ -153,11 +142,8 @@ void shrinkToFit(myStack* stack) {
 
 void push(myStack* stack, int value) {
   assert(stack != NULL);
-  printf("\n%llu\n", stack->hash_summ);
-  printf("yoy %llu\n", stackHash(stack));
-  stack->hash_summ = stackHash(stack);
+  
   ASSERTOK(stack)
-  printf("ZALUPA\n");
 
   stackNewSize(stack);
 
