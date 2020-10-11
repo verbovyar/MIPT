@@ -60,8 +60,6 @@ void construct(myStack* stack, size_t start_size) {
   for (int i = 1; i <= start_size; ++i) {
     stack->array_[i] = POISON_VALUE;
   }
-
-  ASSERTOK(stack);
 }
 
 myStack* newStack(size_t start_size) {
@@ -103,8 +101,6 @@ void stackNewSize(myStack* stack) {
       stack->array_[i] = POISON_VALUE;
     }
   }
-
-  ASSERTOK(stack)
 }
 
 void shrinkToFit(myStack* stack) {
@@ -131,7 +127,7 @@ void shrinkToFit(myStack* stack) {
     stack->capacity_ /= stack->increase_factor_;
 }
 
-void push(myStack* stack, int value) {
+void push(myStack * stack, int value) {
   assert(stack != NULL);
 
   ASSERTOK(stack)
@@ -144,8 +140,6 @@ void push(myStack* stack, int value) {
   #ifdef DEBUG
   stack->hash_summ = stackHash(stack);
   #endif
-
-  ASSERTOK(stack)
 }
 
 void pop(myStack * stack) {
@@ -159,8 +153,6 @@ void pop(myStack * stack) {
   #ifdef DEBUG
   stack->hash_summ = stackHash(stack);
   #endif
-
-  ASSERTOK(stack)
 }
 
 elem_t top(myStack* stack) {
@@ -192,8 +184,6 @@ void deleteStack(myStack* stack) {
   #ifdef DEBUG
   stack->hash_summ = stackHash(stack);
   #endif
-
-  ASSERTOK(stack)
 }
 
 void clearStack(myStack* stack) {
@@ -212,25 +202,37 @@ void clearStack(myStack* stack) {
   #ifdef DEBUG
   stack->hash_summ = stackHash(stack);
   #endif
-
-  ASSERTOK(stack)
 }
 
-int stackHash(myStack * stack) { 
-    int hash_summ = 0;
+#ifdef STACK_DEBUG
+  uint64_t stackHash(myStack * stack) {
+  int hash_summ = 0;
+  const char* temp = (const char*)stack;
 
-    const char* temp = (const char*)stack;
-    uint32_t size = 3 * sizeof(int) + sizeof(elem_t);
-    for (int i = 0; i < size; i += 4) {
-      int bit = temp[i];
-      bit = (bit << 1) + ((bit >> 31) & 1);
-      hash_summ = bit ^ hash_summ;
+  uint64_t size_of_hash = sizeof(myStack);
+  for (int i = 0; i < size_of_hash; ++i) {
+    int bite = temp[i]; 
+    hash_summ += (bite * i);
+  }
+
+  return hash_summ;
+}
+
+ bool hashOk(myStack* stack) {
+    uint62_t temp_hash = stack->hash_summ;  
+    uint64_t new_hash = stackHash(stack);
+
+    if (temp_hash != new_hash) {
+      return HASH_ERROR;
     }
 
-    return hash_summ;
-}
+    return NO_ERROR;
+ }
+
+#endif
 
 STACK_ERROR stackOk(myStack* stack) {
+
   if (stack == NULL) {
     return CONSTRUCT_ERROR;
   }
@@ -242,7 +244,7 @@ STACK_ERROR stackOk(myStack* stack) {
   #endif
 
   #ifdef STACK_DEBUG 
-  if (stack->hash_summ != stackHash(stack)) {
+  if (HASH_ERROR) {
     return HASH_ERROR;
   }
   #endif
