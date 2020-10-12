@@ -18,6 +18,10 @@ uint64_t stackHash(myStack* stack) {
     hash_summ += (bite * i);
   }
 
+  for (int i = 0; i < stack->capacity_ + 1; ++i) {
+    hash_summ += i * (uint64_t)stack->array_[i];
+  }
+
   return hash_summ;
 }
 
@@ -163,7 +167,7 @@ void pop(myStack* stack) {
   stack->array_[stack->size_] = POISON_VALUE;
   --stack->size_;
 
-#ifdef DEBUG
+#ifdef STACK_DEBUG
   stack->hash_summ = stackHash(stack);
 #endif
 }
@@ -176,10 +180,6 @@ elem_t top(myStack* stack) {
   elem_t value = stack->array_[stack->size_];
 
   ASSERTOK(stack)
-
-#ifdef DEBUG
-  stack->hash_summ = stackHash(stack);
-#endif
 
   return value;
 }
@@ -194,7 +194,7 @@ void deleteStack(myStack* stack) {
   stack->capacity_ = 0;
   free(stack);
 
-#ifdef DEBUG
+#ifdef STACK_DEBUG
   stack->hash_summ = stackHash(stack);
 #endif
 }
@@ -212,12 +212,15 @@ void clearStack(myStack* stack) {
   stack->size_ = 0;
   stack = NULL;
 
-#ifdef DEBUG
+#ifdef STACK_DEBUG
   stack->hash_summ = stackHash(stack);
 #endif
 }
 
 STACK_ERROR stackOk(myStack* stack) {
+
+  assert(stack != NULL);
+
   if (stack == NULL) {
     return CONSTRUCT_ERROR;
   }
@@ -268,6 +271,9 @@ void stackDump(myStack* stack) {
       fprintf(log_file, "Out of array!\n");
       fprintf(log_file, "Capacity:%d\n", stack->capacity_);
       fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file, "array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }
@@ -275,6 +281,9 @@ void stackDump(myStack* stack) {
       fprintf(log_file, "Stack array error!\n");
       fprintf(log_file, "Capacity:%d\n", stack->capacity_);
       fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file, "array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }
@@ -282,25 +291,43 @@ void stackDump(myStack* stack) {
       fprintf(log_file, "Memory array stack error!\n");
       fprintf(log_file, "Pointer is NULL:%p\n", stack->array_);
       fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file, "array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }
     case (POP_ERROR): {
       fprintf(log_file, "Stack is empty, you cant pop element!\n");
-      fprintf(log_file, "Stack size:%d\n", stack->size_);
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file, "array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }
     case (CONSTRUCT_ERROR): {
       fprintf(log_file, "Stack construct error!\n");
       fprintf(log_file, "Pointer is NULL:%p\n", stack);
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file, "array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }
 
 #ifdef STACK_DEBUG
     case (HASH_ERROR): {
-      fprintf(log_file, "Hash_error, you cant to change buffer!");
+      fprintf(log_file, "Hash_error, you cant to change buffer!\n");
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file,"array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }
@@ -309,10 +336,15 @@ void stackDump(myStack* stack) {
 #ifdef STACK_DEBUG
     case (STRUCT_ERROR): {
       fprintf(log_file, "You cant to change struct(stack)!\n");
-      fprintf(log_file, "Right CNRY:%u \n", stack->right_cnry_);
-      fprintf(log_file, "Real CNRY:%u", RIGHT_CNRY);
-      fprintf(log_file, "Left CNRY:%u \n", stack->left_cnry_);
-      fprintf(log_file, "Real CNRY:%u", LEFT_CNRY);
+      fprintf(log_file, "Right CNRY:%lf \n", stack->right_cnry_);
+      fprintf(log_file, "Real CNRY:%lf", RIGHT_CNRY);
+      fprintf(log_file, "Left CNRY:%lf \n", stack->left_cnry_);
+      fprintf(log_file, "Real CNRY:%lf", LEFT_CNRY);
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file, "array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }
@@ -321,10 +353,15 @@ void stackDump(myStack* stack) {
 #ifdef STACK_DEBUG
     case (ARRAY_ERROR): {
       fprintf(log_file, "You cant to change array(stack)!\n");
-      fprintf(log_file, "Left  CNRY:%llu \n", stack->array_[0]);
-      fprintf(log_file, "Real  CNRY:%llu\n", LEFT_CNRY);
-      fprintf(log_file, "Right CNRY:%llu \n", stack->array_[stack->capacity_ + 1]);
-      fprintf(log_file, "Real  CNRY:%llu \n", RIGHT_CNRY);
+      fprintf(log_file, "Left  CNRY:%lf \n", stack->array_[0]);
+      fprintf(log_file, "Real  CNRY:%lf\n", LEFT_CNRY);
+      fprintf(log_file, "Right CNRY:%lf \n", stack->array_[stack->capacity_ + 1]);
+      fprintf(log_file, "Real  CNRY:%lf \n", RIGHT_CNRY);
+      fprintf(log_file, "Capacity:%d\n", stack->capacity_);
+      fprintf(log_file, "Size:%d\n", stack->size_);
+      for (int i = 1; i <= stack->size_; ++i) {
+        fprintf(log_file, "array[%d] = %lf\n", i - 1, stack->array_[i]);
+      }
 
       break;
     }

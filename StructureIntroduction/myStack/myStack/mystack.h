@@ -10,10 +10,6 @@ typedef double elem_t;
 
 struct myStack {
 #ifdef STACK_DEBUG
-  uint64_t hash_summ = 0;
-#endif
-
-#ifdef STACK_DEBUG
   elem_t left_cnry_ = 0;
 #endif
 
@@ -24,6 +20,10 @@ struct myStack {
 
 #ifdef STACK_DEBUG
   elem_t right_cnry_ = 0;
+#endif
+
+#ifdef STACK_DEBUG
+  uint64_t hash_summ = 0;
 #endif
 };
 

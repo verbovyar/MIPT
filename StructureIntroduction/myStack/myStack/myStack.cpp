@@ -6,14 +6,14 @@
 #include "mystack.h"
 
 int main() {
-  myStack* stck = newStack(3);
+  myStack* stck = newStack(5);
+  
   for (int i = 0; i < 5; ++i) {
     push(stck, 10);
   }
-  push(stck, 7);
-  printf("%lf\n", top(stck));
-  pop(stck);
-  printf("%lf", top(stck));
+
+  stck->array_[2] = 7;
+  top(stck);
 
   return 0;
 }
