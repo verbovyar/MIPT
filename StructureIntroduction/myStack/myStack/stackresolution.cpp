@@ -96,17 +96,16 @@ void stackNewSize(myStack* stack) {
     free(stack->array_);
     stack->array_ = temp;
     *(elem_t*)stack->array_ = LEFT_CNRY;
-    *((elem_t*)stack->array_ + (stack->capacity_ * stack->increase_factor_ + 1) * 1) = RIGHT_CNRY;
+    *((elem_t*)stack->array_ + (stack->capacity_ * stack->increase_factor_ + 1)) = RIGHT_CNRY;
 
 #else
 
-    elem_t* temp = (elem_t*)calloc(1, stack->capacity_ * stack->increase_factor_ * 1);
+    elem_t* temp = (elem_t*)calloc(1, stack->capacity_ * stack->increase_factor_);
     if (temp == NULL) {
       return;
     }
 #endif
 
-    //stack->array_ = temp;
     stack->capacity_ *= stack->increase_factor_;
     for (int i = stack->size_; i < stack->capacity_; ++i) {
       stack->array_[i] = POISON_VALUE;
@@ -131,8 +130,7 @@ void shrinkToFit(myStack* stack) {
     stack->capacity_ /= stack->increase_factor_;
 
     *(elem_t*)stack->array_ = LEFT_CNRY;
-    *(elem_t*)(stack->array_ + sizeof(elem_t) + (stack->capacity_ / stack->increase_factor_) * sizeof(elem_t)) =
-        RIGHT_CNRY;
+    *(elem_t*)(stack->array_ + sizeof(elem_t) + (stack->capacity_ / stack->increase_factor_) * sizeof(elem_t)) = RIGHT_CNRY;
 
     stack->hash_summ = stackHash(stack);
   }
