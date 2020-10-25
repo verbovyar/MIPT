@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+#pragma once
 
 #include <math.h>
 #include <stdio.h>
@@ -5,7 +7,6 @@
 #include <assert.h>
 #include <cstdint>
 
-//------
 typedef double elem_t;
 
 struct myStack {
@@ -27,7 +28,7 @@ struct myStack {
 #endif
 };
 
-
+//------
 void push(myStack* stack, int value);
 void pop(myStack* stack);
 void deleteStack(myStack* stack);
@@ -46,16 +47,16 @@ myStack* newStack(size_t start_size);
 
 //------
 
-enum STACK_ERROR {
-  SIZE_ERROR = 101,
-  POINTER_ERROR = 202,
-  POP_ERROR = 303,
-  STACK_POINTER_ERROR = 404,
-  CONSTRUCT_ERROR = 505,
-  STRUCT_ERROR = 606,
-  ARRAY_ERROR = 707,
-  HASH_ERROR = 808,
-  NO_ERROR = 0
+enum STACK_ERROR{
+  SIZE_ERROR,
+  POINTER_ERROR,
+  POP_ERROR,
+  STACK_POINTER_ERROR,
+  CONSTRUCT_ERROR,
+  STRUCT_ERROR,
+  ARRAY_ERROR,
+  HASH_ERROR,
+  NO_ERROR
 };
 void stackDump(myStack* stack);
 STACK_ERROR stackOk(myStack* stack);

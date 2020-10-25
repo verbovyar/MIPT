@@ -1,6 +1,20 @@
-push 2
-push 2
-summ
-sqrt
-out
-hult
+PUSH 1
+PUSH 6
+PUSH 8
+POP rax
+POP rbx
+POP rcx
+PUSH rbx
+PUSH rbx
+MUL
+POP rdx
+PUSH 4
+PUSH rax
+MUL
+PUSH rcx
+MUL
+PUSH rdx
+MIN
+SQRT
+OUT
+HLT

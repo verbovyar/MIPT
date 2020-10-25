@@ -25,3 +25,4 @@ READERROR readcomands(comandsList* comands, char* name);
 size_t getFileSize(const char* file_name);
 size_t getLinesCount(comandsList* comands);
 void linesConstruct(comandsList* comands);
+void writeToBin(char* code_buffer, int PC);
