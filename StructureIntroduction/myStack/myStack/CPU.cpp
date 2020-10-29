@@ -11,17 +11,17 @@ void getAnswer()
 
 	getFile(name, &my_cpu);
 
-	int i = 0;
+	int OFS = 0;
 	while (my_cpu.isWorking)
 	{
-		int comand = my_cpu.comand_buffer[i];
+		int comand = my_cpu.comand_buffer[OFS];
 		switch (comand)
 		{
-			#define DEF_CMD(name, num, arg, code)\
-			case(num):\
-			{\
-				code\
-				break;\
+			#define DEF_CMD(name, num, arg, code)	\
+			case(num):								\
+			{										\
+				code								\
+				break;								\
 			}
 			#include "comands.h"
 		}
@@ -30,7 +30,7 @@ void getAnswer()
 		//printf("RBX:%lf\n", my_cpu.rbx);
 		//printf("RCX:%lf\n", my_cpu.rcx);
 		//printf("RDX:%lf\n", my_cpu.rdx);
-		++i;
+		++OFS;
 	}
 }
 

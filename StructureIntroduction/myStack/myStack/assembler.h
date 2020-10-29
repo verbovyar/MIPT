@@ -15,6 +15,11 @@ struct comandsList {
   char** lines = NULL;
 };
 
+struct Label {
+	char* lab_name = NULL;
+	size_t PC = 0;
+};
+
 enum READERROR { 
 	READ_ERROR, 
 	NON_READ_ERROR 
@@ -26,3 +31,8 @@ size_t getFileSize(const char* file_name);
 size_t getLinesCount(comandsList* comands);
 void linesConstruct(comandsList* comands);
 void writeToBin(char* code_buffer, int PC);
+bool isLabel(const char* token);
+Label* labelConstr();
+void addNumber(char* code_buffer, const char* token, Label* label);
+bool myIsAlphabet(const char symbol);
+void writeLableName(Label* label);
