@@ -1,13 +1,13 @@
-#define TOPDEF double temp1 = top(my_cpu.stck);\
-			pop(my_cpu.stck);\
-			double temp2 = top(my_cpu.stck);\
+#define TOPDEF double temp1 = top(my_cpu.stck);	\
+			pop(my_cpu.stck);					\
+			double temp2 = top(my_cpu.stck);	\
 			pop(my_cpu.stck)
 
-#define POPDEF double temp1 = top(my_cpu.stck);\
+#define POPDEF double temp1 = top(my_cpu.stck);	\
 			pop(my_cpu.stck)
 
 #define OFSET ++my_cpu.OFS;\
-my_cpu.OFS = *(int*)(my_cpu.comand_buffer + my_cpu.OFS) - 2;
+			my_cpu.OFS = *(int*)(my_cpu.comand_buffer + my_cpu.OFS) - 2;
 
 DEF_CMD(PUSH, 1, 1, {
 	++my_cpu.OFS;
@@ -69,6 +69,12 @@ DEF_CMD(SUM, 3, 0, {
 DEF_CMD(DIV, 4, 0, {
 	TOPDEF;
 
+	if (temp1 == 0)
+	{
+		printf("DIV ON ZERO!!!\n");
+
+		return;
+	}
 	push(my_cpu.stck, temp2 / temp1);
 })
 
@@ -203,7 +209,7 @@ DEF_CMD(CALL, 19, 1, {
 DEF_CMD(RET, 20, 0, {
 	my_cpu.OFS = top(my_cpu.call_stack);
 	pop(my_cpu.call_stack);
-	})
+})
 
 DEF_CMD(IN, 21, 0, {
 	double temp_numb = 0;

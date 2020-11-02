@@ -1,7 +1,7 @@
 ﻿  assembler.cpp
 C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.cpp(1,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
 C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.cpp(5,22): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.cpp(6,28): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.cpp(26,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.h(12,29): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.h(13,34): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Yaroslav\source\repos\Proessor\assembler\assembler\assembler.cpp(20,27): warning C4018: '<': signed/unsigned mismatch
   assembler.vcxproj -> C:\Users\Yaroslav\source\repos\Proessor\assembler\Debug\assembler.exe

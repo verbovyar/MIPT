@@ -2,72 +2,62 @@
 
 #include "assembler.h"
 
-const int MAX_SIZE = 1e6;
-const int MAX_LABLE_SIZE = 1e4;
-const int MAX_LABLE_SYMBOLS = 15;
 const char* DELIMETER = " ;\t";
 
-comandsList comands = {};
-void interpritation()
+void getByteCode(const char* name)
 {
-    char name[] = "comand.txt";
-    readcomands(&comands, name);
+    comandsList* comands = comandsConstr();
+    readcomands(comands, name);
+    linesConstruct(comands);
 
-    linesConstruct(&comands);
+    Label* label = labelArrayConstr();
 
-    Label* label = labelConstr();
-
-    char* code_buffer = (char*)calloc(MAX_SIZE, sizeof(char));
-    const char* temp; //!!!
-    for (int k = 0; k < 2; ++k)
+    char* code_buffer = (char*)calloc(MAX_BUFFER_SIZE, sizeof(char));
+    for (int passage = 0; passage < PASEGES_COUNT; ++passage)
     {
-        comands.OFS = 0;
-        int lab_ind = 0;
-        for (int i = 0; i < comands.comands_count; ++i)
+        comands->ofs = 0;
+        int lab_idx = 0;
+        for (int i = 0; i < comands->comands_count; ++i)
         {
-            char temp_token[256];
-            strcpy(temp_token, comands.lines[i]);
-            const char* token = strtok(temp_token, DELIMETER);
-            temp = token;
+            char temp_comand[MAX_STR_SIZE];
+            strcpy(temp_comand, comands->lines[i]);
+            const char* token = strtok(temp_comand, DELIMETER);
+            const char* temp_token = token;
 
-            #define DEF_CMD(name, num, arg, code)                               \
-                                                                                \
-                if (strcmp(token, #name) == 0)                                  \
-                {                                                               \
-                    code_buffer[comands.OFS] = num;                             \
-                    if (arg > 0)                                                \
-                    {                                                           \
-                        token = strtok(NULL, DELIMETER);                        \
-                        addArgument(code_buffer, token, label, lab_ind);        \
-                    }                                                           \
-                    ++comands.OFS;                                              \
-                }                                                               \
+            #define DEF_CMD(name, num, arg, code)                                       \
+                                                                                        \
+                if (strcmp(token, #name) == 0)                                          \
+                {                                                                       \
+                    code_buffer[comands->ofs] = num;                                    \
+                    if (arg > 0)                                                        \
+                    {                                                                   \
+                        token = strtok(NULL, DELIMETER);                                \
+                        addArgument(token, label, lab_idx, code_buffer, comands);       \
+                    }                                                                   \
+                    ++comands->ofs;                                                     \
+                }                                                                       \
                 else 
-            #include "../../comands.h"
-            if (isLabel(token = strtok(NULL, DELIMETER)))
-            {
-                writeLableName(label, temp, &lab_ind);
-            }
-            else
-            {
-                printf("ERROR");
-            }
+                #include "../../comands.h"
+                if (isLabel(token = strtok(NULL, DELIMETER)))
+                {
+                    writeLableName(temp_token, label, &lab_idx, comands);
+                }
+                else
+                {
+                    printf("ERROR");
+                }
 
             #undef DEF_CMD
         }
     }
 
-    for (int i = 0; i < 8; ++i)
-    {
-       // printf("[%d] %s\n", label[i].PC, label[i].lab_name);
-    }
-
-    writeToBin(code_buffer, comands.OFS);
+    writeToBin(code_buffer, comands->ofs);
 
     free(code_buffer);
+    free(label);
 }
 
-READERROR readcomands(comandsList* comands, char* name)
+READERROR readcomands(comandsList* comands, const char* name)
 {
     assert(comands != NULL);
 
@@ -80,7 +70,7 @@ READERROR readcomands(comandsList* comands, char* name)
         return READ_ERROR;
     }
 
-    comands->buffer_size = getFileSize("comand.txt");
+    comands->buffer_size = getFileSize(name);
     comands->buffer = (char*)calloc(comands->buffer_size + 1, sizeof(char));
     fread(comands->buffer, sizeof(char), comands->buffer_size + 1, file_descriptor);
 
@@ -116,25 +106,34 @@ size_t getLinesCount(comandsList* comands)
     return lines_count;
 }
 
-Label* labelConstr()
+Label* labelArrayConstr()
 {
-    Label* label = (Label*)calloc(MAX_LABLE_SIZE, sizeof(Label));
+    Label* label = (Label*)calloc(MAX_LABLE_ARRAY_SIZE, sizeof(Label));
+
     return label;
+}
+
+comandsList* comandsConstr()
+{
+    comandsList* comands = (comandsList*)calloc(1, sizeof(comandsList));
+
+    return comands;
 }
 
 bool isLabel(const char* token)
 {
     const char* elem[] = { ":" };
+
     return (strcmp(token, elem[0]) == 0);
 }
 
-void writeLableName(Label* label, const char* temp, int* lab_ind)
+void writeLableName(const char* token, Label* label, int* lab_idx, comandsList* comands)
 {
-    label[*lab_ind].lab_name = (char*)calloc(strlen(temp) + 1, sizeof(char));
-    strcpy(label[*lab_ind].lab_name, temp);
-    label[*lab_ind].PC = comands.OFS + 1;
-    //printf("[%d] %s\n", label[*lab_ind].PC, label[*lab_ind].lab_name);
-    ++(*lab_ind);
+    label[*lab_idx].lab_name = (char*)calloc(strlen(token) + 1, sizeof(char));
+    strcpy(label[*lab_idx].lab_name, token);
+    label[*lab_idx].pc = comands->ofs + 1;
+    //printf("[%d] %s\n", label[*lab_idx].pc, label[*lab_idx].lab_name);
+    ++(*lab_idx);
 }
 
 void linesConstruct(comandsList* comands)
@@ -169,36 +168,36 @@ void linesConstruct(comandsList* comands)
 }
 
 const char* registers[] = { "rax", "rbx", "rcx", "rdx" };
-void addArgument(char* code_buffer, const char* token, Label* label, int lab_ind)
+void addArgument(const char* token, Label* label, int lab_ind, char* code_buffer, comandsList* comands)
 {
     double numb = 0;
 
     if (sscanf(token, "%lf", &numb))
     {
-        ++comands.OFS;
-        code_buffer[comands.OFS] = 0;
-        *(double*)(code_buffer + comands.OFS + 1) = numb;
-        comands.OFS += sizeof(double);
+        ++comands->ofs;
+        code_buffer[comands->ofs] = 0;
+        *(double*)(code_buffer + comands->ofs + 1) = numb;
+        comands->ofs += sizeof(double);
     }
     else if (myIsAlphabet(*token))
     {
         int i = 0;
-        while (i < MAX_LABLE_SIZE && label[i].lab_name != NULL && strcmp(token, label[i].lab_name) != 0)
+        while (i < MAX_LABLE_ARRAY_SIZE && label[i].lab_name != NULL && strcmp(token, label[i].lab_name) != 0)
         {
             ++i;
         }
-        //printf("[%d] %s\n", label[i].PC, label[i].lab_name);
-        *(int*)(code_buffer + comands.OFS + 1) = label[i].PC;
-        comands.OFS += sizeof(int);
+        //printf("[%d] %s\n", label[i].pc, label[i].lab_name);
+        *(int*)(code_buffer + comands->ofs + 1) = label[i].pc;
+        comands->ofs += sizeof(int);
     }
     else
     {
-        for (int index = 0; index < 4; ++index)
+        for (int index = 0; index < REGISTERS_COUNT; ++index)
         {
             if (strcmp(token, registers[index]) == 0)
             {
-                ++comands.OFS;
-                code_buffer[comands.OFS] = index + 1;
+                ++comands->ofs;
+                code_buffer[comands->ofs] = index + 1;
             }
         }
     }
@@ -209,11 +208,11 @@ bool myIsAlphabet(const char symbol)
     return (symbol >= 'A' && symbol <= 'Z');
 }
 
-void writeToBin(char* code_buffer, int PC)
+void writeToBin(char* code_buffer, int pc)
 {
     FILE* file = fopen("assembler_code.bin", "wb");
 
-    fwrite(code_buffer, sizeof(char), PC, file);
+    fwrite(code_buffer, sizeof(char), pc, file);
 
     fclose(file);
 }

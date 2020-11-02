@@ -2,11 +2,11 @@
 C:\Users\Yaroslav\source\repos\Proessor\comands.h(12,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
 C:\Users\Yaroslav\source\repos\Proessor\comands.h(63,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
 C:\Users\Yaroslav\source\repos\Proessor\comands.h(69,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\Yaroslav\source\repos\Proessor\comands.h(75,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
 C:\Users\Yaroslav\source\repos\Proessor\comands.h(81,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
 C:\Users\Yaroslav\source\repos\Proessor\comands.h(87,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
 C:\Users\Yaroslav\source\repos\Proessor\comands.h(93,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\Yaroslav\source\repos\Proessor\comands.h(109,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\Yaroslav\source\repos\Proessor\comands.h(203,1): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\Yaroslav\source\repos\Proessor\comands.h(208,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Yaroslav\source\repos\Proessor\comands.h(99,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Yaroslav\source\repos\Proessor\comands.h(115,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Yaroslav\source\repos\Proessor\comands.h(209,1): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\Yaroslav\source\repos\Proessor\comands.h(214,1): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   processor.vcxproj -> C:\Users\Yaroslav\source\repos\Proessor\processor\Debug\processor.exe

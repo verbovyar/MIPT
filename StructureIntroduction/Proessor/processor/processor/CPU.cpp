@@ -1,8 +1,8 @@
 #include "CPU.h"
 
-CPU my_cpu = {};
 void getAnswer()
 {
+	CPU my_cpu = {};
 	my_cpu.stck = newStack(5);
 	my_cpu.call_stack = newStack(5);
 	char name[] = "assembler_code.bin";

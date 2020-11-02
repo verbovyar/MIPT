@@ -6,17 +6,23 @@
 #include <string.h>
 #include <sys/stat.h>
 
+const int PASEGES_COUNT = 2;
+const int MAX_STR_SIZE = 256;
+const int REGISTERS_COUNT = 4;
+const int MAX_BUFFER_SIZE = 1e6;
+const int MAX_LABLE_ARRAY_SIZE = 1e4;
+
 struct comandsList {
 	char* buffer = NULL;
-	size_t comands_count = 0;
-	size_t buffer_size = 0;
 	char** lines = NULL;
-	int OFS = 0;
+	size_t comands_count = 0;
+	size_t buffer_size   = 0;
+	int ofs              = 0;
 };
 
 struct Label {
 	char* lab_name = NULL;
-	int PC = 0;
+	int pc = 0;
 };
 
 enum READERROR {
@@ -24,16 +30,17 @@ enum READERROR {
 	NON_READ_ERROR
 };
 
-void interpritation();
-size_t getFileSize(const char* file_name);
+void getByteCode(const char* name);
+Label* labelArrayConstr();
+comandsList* comandsConstr();
 
-READERROR readcomands    (comandsList* comands, char* name);
+READERROR readcomands    (comandsList* comands, const char* name);
 size_t    getLinesCount  (comandsList* comands);
 void      linesConstruct (comandsList* comands);
 
-void writeToBin(char* code_buffer, int PC);
-bool isLabel(const char* token);
-Label* labelConstr();
-void addArgument(char* code_buffer, const char* token, Label* label, int lab_ind);
-bool myIsAlphabet(const char symbol);
-void writeLableName(Label* label, const char* temp, int* lab_ind);
+size_t getFileSize    (const char* file_name);
+bool   isLabel        (const char* token);
+void   addArgument    (const char* token, Label* label, int lab_idx, char* code_buffer, comandsList* comands);
+void   writeLableName (const char* token, Label* label, int* lab_idx, comandsList* comands);
+bool   myIsAlphabet   (const char symbol);
+void   writeToBin     (char* code_buffer, int pc);

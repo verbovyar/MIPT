@@ -1,8 +1,8 @@
-#include "assembler.h"
+#include "CPU.h"
 
 int main()
 {
-	interpritation();
+	getAnswer();
 
 	return 0;
 }
