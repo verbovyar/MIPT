@@ -1,28 +1,33 @@
 IN
-CALL Factorial
+CALL Fibonacci
 OUT
-HLT
-Factorial :
+JMP STOP_HLT
+Fibonacci :
 POP rax
-PUSH 1
-POP rbx
 PUSH rax
-PUSH rbx
-MUL
-CALL FactorialRec
-RET
-FactorialRec :
-PUSH rbx
-PUSH 1
-SUM
-POP rbx
-PUSH rbx
-MUL
-PUSH rbx
-PUSH 1
-SUM
+PUSH 0
+JE stop
 PUSH rax
-JAE RecEnd
-CALL FactorialRec
-RecEnd :
+PUSH 1
+JE STOP
+JMP CONTINUE		
+STOP :
+PUSH 1
 RET
+CONTINUE :
+PUSH rax
+PUSH rax
+PUSH 1
+DEC
+CALL Fibonacci
+POP rbx
+POP rax
+PUSH rbx 
+PUSH rax
+PUSH 2
+DEC
+CALL Fibonacci
+SUM
+RET
+STOP_HLT : 
+HLT
