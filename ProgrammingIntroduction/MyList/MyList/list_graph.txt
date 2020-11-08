@@ -1,0 +1,44 @@
+digraph G{
+node [shape="record", style="filled", color="#008000", fillcolor="#C0FFC0"];
+"00F1ABD0" [color="#000080", label="{9|{2|1|0}}"];
+edge[color=white]
+"00F1ABD0"->"00F1ABE0";
+"00F1ABE0" [color="#000080", label="{10|{3|2|1}}"];
+edge[color=white]
+"00F1ABE0"->"00F1ABF0";
+"00F1ABF0" [color="#000080", label="{11|{4|3|2}}"];
+edge[color=white]
+"00F1ABF0"->"00F1AC00";
+"00F1AC00" [color="#000080", label="{12|{8|4|3}}"];
+edge[color=white]
+"00F1AC00"->"00F1AC10";
+"00F1AC10" [fillcolor="#EFE28E", label="{FREE|{5|9}}"];
+edge[color=white]
+"00F1AC10"->"00F1AC20";
+"00F1AC20" [color="#000080", label="{14|{0|6|8}}"];
+edge[color=white]
+"00F1AC20"->"00F1AC30";
+"00F1AC30" [fillcolor="#EFE28E", label="{FREE|{7|10}}"];
+edge[color=white]
+"00F1AC30"->"00F1AC40";
+"00F1AC40" [color="#000080", label="{34|{6|8|4}}"];
+edge[color=white]
+"00F1AC40"->"00F1AC50";
+"00F1AC50" [fillcolor="#EFE28E", label="{FREE|{9|7}}"];
+edge[color=white]
+"00F1AC50"->"00F1AC60";
+"00F1AC60" [fillcolor="#EFE28E", label="{FREE|{10|0}}"];
+"HEAD" [color="#000080", fillcolor="#C0C0FF", label="{HEAD}"];
+edge[color=black]
+"HEAD"->"00F1AC20";
+edge[color=black]
+"00F1AC20"->"00F1AC40";
+edge[color=black]
+"00F1AC40"->"00F1AC00";
+edge[color=black]
+"00F1AC00"->"00F1ABF0";
+edge[color=black]
+"00F1ABF0"->"00F1ABE0";
+edge[color=black]
+"00F1ABE0"->"00F1ABD0";
+"00F1ABD0"->"HEAD"}
