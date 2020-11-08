@@ -1,6 +1,4 @@
-#include "list.h"
-
-typedef int elem_t;
+#include "list.h"								
 
 struct ListNode {
 	elem_t data				= 0;
@@ -22,7 +20,6 @@ List* NewList(size_t capacity)
 {
 	List* list = (List*)calloc(1, sizeof(List));
 	list->buffer = (ListNode*)calloc(capacity + 1, sizeof(ListNode));
-	assert(list->buffer != NULL);
 
 	list->capacity = capacity;
 	list->size = 0;
@@ -48,6 +45,9 @@ List* NewList(size_t capacity)
 void pushHead(List* list, int64_t value)
 {
 	assert(list != NULL);
+	ASSERT(list)
+
+	REALLOCATION
 
 	++list->size;
 
@@ -70,11 +70,14 @@ void pushHead(List* list, int64_t value)
 		list->head = list->free;
 		list->free = temp_free_idx;
 	}
+
+	ASSERT(list)
 }
 
  int32_t findIdx(List* list, int32_t value)
 {
-	 assert(list != NULL);
+	assert(list != NULL);
+	ASSERT(list)
 
 	int idx = list->head;
 	for (int i = 0; i < value - 1; ++i)
@@ -83,11 +86,16 @@ void pushHead(List* list, int64_t value)
 	}
 
 	return idx;
+
+	ASSERT(list)
 }
 
  void pushInIdx(List* list, int64_t value, int32_t idx)
  {
 	 assert(list);
+	 ASSERT(list)
+
+	 REALLOCATION
 
 	 int32_t real_idx = findIdx(list, idx);
 
@@ -102,25 +110,40 @@ void pushHead(List* list, int64_t value)
 	 list->buffer[list->buffer[real_idx].prev].next = list->free;
 	 list->buffer[real_idx].prev = list->free;
 	 list->free = temp_free_idx;
+
+	 ASSERT(list)
  }
 
  void pushAfterIdx(List* list, int64_t value, int32_t idx)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
+
+	 REALLOCATION
 
 	 pushInIdx(list, value, idx + 1);
+
+	 ASSERT(list)
  }
 
  void pushBeforeIdx(List* list, int64_t value, int32_t idx)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
+
+	 REALLOCATION
 
 	 pushInIdx(list, value, idx - 1);
+
+	 ASSERT(list)
  }
 
  void pushTail(List* list, int64_t value)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
+
+	 REALLOCATION
 
 	 ++list->size;
 
@@ -133,29 +156,41 @@ void pushHead(List* list, int64_t value)
 	 list->tail = list->free;
 	 list->free = temp_free_idx;
 
+	 ASSERT(list)
  }
 
  void popHead(List* list)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
 
 	 list->buffer[list->buffer[list->head].next].prev = 0;
+	 int32_t idx = list->head;
+	 list->head = list->buffer[list->head].next;
 
-	 deleteNode(list, list->head);
+	 deleteNode(list, idx);
+
+	 ASSERT(list)
  }
 
  void popTail(List* list)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
 
 	 list->buffer[list->buffer[list->tail].prev].next = 0;
+	 int32_t idx = list->tail;
+	 list->tail = list->buffer[list->head].prev;
 
-	 deleteNode(list, list->tail);
+	 deleteNode(list, idx);
+
+	 ASSERT(list)
  }
 
  void popInIdx(List* list, int32_t idx)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
 
 	 --list->size;
 
@@ -165,32 +200,46 @@ void pushHead(List* list, int64_t value)
 	 list->buffer[list->buffer[real_idx].next].prev = list->buffer[real_idx].prev;
 
 	 deleteNode(list, real_idx);
+
+	 ASSERT(list)
  }
 
  elem_t getValue(List* list, int32_t idx)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
 
 	 int32_t real_idx = findIdx(list, idx);
 
 	 return list->buffer[real_idx].data;
+
+	 ASSERT(list)
  }
 
  void deleteNode(List* list, int32_t idx)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
 
 	 --list->size;
 
 	 list->buffer[idx].next = list->free;
-	 list->buffer[idx].prev = 0;
+	 list->buffer[idx].prev = -1;
 	 list->buffer[idx].data = 0;
 	 list->free = idx;
+
+	 ASSERT(list)
+ }
+
+ void reallocation(List* list)
+ {
+	 ListNode* temp = (ListNode*)realloc(list->buffer, list->capacity * INCREASE_FACTOR);
  }
 
  void freeList(List* list)
  {
 	 assert(list != NULL);
+	 ASSERT(list)
 
 	 free(list->buffer);
 	 list->buffer = NULL;
@@ -201,4 +250,43 @@ void pushHead(List* list, int64_t value)
 
 	 list->size = 0;
 	 list->capacity = 0;
+
+	 ASSERT(list)
+ }
+
+ ListError listOk(List* list)
+ {
+	 if (list == NULL)
+	 {
+		 return ERROR;
+	 }
+
+	 if (list->capacity < list->size)
+	 {
+		 return ERROR;
+	 }
+
+	 if (list->capacity < 0)
+	 {
+		 return ERROR;
+	 }
+ }
+
+ void listDump(List* list)
+ {
+	 FILE* log_file = fopen("logfile.txt", "w");
+
+	 fprintf(log_file, "Capacity:%d\n", list->capacity);
+	 fprintf(log_file, "Size:%d\n", list->size);
+	 fprintf(log_file, "Tail:%d\n", list->tail);
+	 fprintf(log_file, "Head:%d\n", list->head);
+
+	 for (int i = 0; i < list->capacity; ++i)
+	 {
+		 fprintf(log_file, "Value[%d]:%d\n", i, list->buffer[i].data);
+		 fprintf(log_file, "Next[%d]:%d\n", i,list->buffer[i].next);
+		 fprintf(log_file, "Prev[%d]:%d\n", i, list->buffer[i].prev);
+	 }
+
+	 fclose(log_file);
  }

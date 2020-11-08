@@ -15,6 +15,14 @@ int main()
     pushHead(list, 17);
 
     pushInIdx(list, 34, 3);
+    
+    pushTail(list, 5);
+
+    popHead(list);
+    popTail(list);
+    popInIdx(list, 3);
+
+    printf("Numb:[%d]", getValue(list, 1));
 
     freeList(list);
 

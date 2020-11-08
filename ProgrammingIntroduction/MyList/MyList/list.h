@@ -7,7 +7,27 @@
 #include <assert.h>
 #include <stdint.h>
 
+const int INCREASE_FACTOR = 2;
+
 struct List;
+typedef int elem_t;
+
+#ifdef LIST_DEBUG
+#define ASSERT(list) if (listOk(list) != NO_ERROR) {listDump; assert(!Read log file);}
+#else
+#define ASSERT(list);
+#endif // LIST_DEBUG
+
+#define REALLOCATION if (list->size == list->capacity)				\
+						{											\
+							printf("your list need to realloc!");	\
+							reallocation(list);						\
+						}
+
+enum ListError {
+	NO_ERROR,
+	ERROR
+};
 
 enum NodeStatus {
 	FREE,
@@ -15,6 +35,9 @@ enum NodeStatus {
 };
 
 List* NewList		(size_t capacity);
+ListError listOk	(List* list);
+void reallocation	(List* list);
+void listDump		(List* list);
 void freeList		(List* list);
 void deleteNode		(List* list, int32_t idx);
 
