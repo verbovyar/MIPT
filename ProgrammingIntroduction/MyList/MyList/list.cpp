@@ -180,7 +180,7 @@ void pushHead(List* list, int64_t value)
 
 	 list->buffer[list->buffer[list->tail].prev].next = 0;
 	 int32_t idx = list->tail;
-	 list->tail = list->buffer[list->head].prev;
+	 list->tail = list->buffer[list->tail].prev;
 
 	 deleteNode(list, idx);
 
@@ -289,4 +289,143 @@ void pushHead(List* list, int64_t value)
 	 }
 
 	 fclose(log_file);
+ }
+
+ void logicSort(List* list)
+ {
+	 elem_t* buffer = (elem_t*)calloc(list->size + 1, sizeof(elem_t));
+	 size_t live_index = list->head;
+	 for (size_t i = 1; i <= list->size && live_index != 0; ++i)
+	 {
+		 buffer[i] = list->buffer[live_index].data;
+		 live_index = list->buffer[live_index].next;
+	 }
+	 for (size_t i = 1; i <= list->size; ++i)
+	 {
+		 list->buffer[i].data = buffer[i];
+		 list->buffer[i].prev = i - 1;
+		 list->buffer[i].next = i + 1;
+	 }
+
+	 list->buffer[list->size].next = 0;
+	 list->free = list->size + 1;
+
+	 list->head = 1;
+	 list->tail = list->size;
+
+	 for (size_t i = list->size + 1; i <= list->capacity; ++i)
+	 {
+		 list->buffer[i].next = i + 1;
+		 list->buffer[i].prev = -1;
+	 }
+
+	 list->buffer[list->capacity].next = 0;
+	 free(buffer);
+ }
+
+ void listDumpLogical(List* list)
+ {
+	 FILE* GraphFile = fopen("list_graph.txt", "w");
+
+	 logicSort(list);
+
+	 fprintf(GraphFile, "digraph G{\n");
+	 fprintf(GraphFile, "node [shape=\"record\", style=\"filled\", color=\"#008000\", fillcolor=\"#C0FFC0\"];\n");
+
+	 fprintf(GraphFile, "\"%p\" [color=\"#000080\", fillcolor=\"#C0C0FF\", label=\"{HEAD}\"];\n", &list->buffer[0]);
+
+	 for (size_t i = 1; i <= list->size; ++i)
+	 {
+		 if (list->buffer[i].prev != -1)
+		 {
+			 fprintf(GraphFile, "\"%p\" [label=\"{%d|{%d|%u|%d}}\"]\n",
+				 &list->buffer[i], list->buffer[i].data, list->buffer[i].prev, i, list->buffer[i].next);
+			 if (i != list->size)
+			 {
+				 if (i != 1)
+				 {
+					 fprintf(GraphFile, "\"%p\"->\"%p\";\n", &list->buffer[i], &list->buffer[list->buffer[i].prev]);
+				 }
+				 else
+				 {
+					 fprintf(GraphFile, "\"%p\"->\"%p\";\n", &list->buffer[list->buffer[i].prev], &list->buffer[i]);
+				 }
+			 }
+			 fprintf(GraphFile, "\"%p\"->\"%p\";\n", &list->buffer[i], &list->buffer[list->buffer[i].next]);
+		 }
+	 }
+	 fprintf(GraphFile, "}");
+
+	 fclose(GraphFile);
+
+	 if (list->size < 100)
+	 {
+		 system("dot -Tjpg list_graph.txt > LogicalList.jpg");
+		 system("start LogicalList.jpg");
+	 }
+ }
+
+ void listDumpReal(List* list)
+ {
+	 FILE* GraphFile = fopen("list_graph.txt", "w");
+
+	 fprintf(GraphFile, "digraph G{\n");
+	 fprintf(GraphFile, "node [shape=\"record\", style=\"filled\", color=\"#008000\", fillcolor=\"#C0FFC0\"];\n");
+
+	 for (size_t i = 1; i <= list->capacity; ++i)
+	 {
+		 if (list->buffer[i].prev == -1)
+		 {
+			 fprintf(GraphFile, "\"%p\" [fillcolor=\"#EFE28E\", label=\"{FREE|{%u|%d}}\"];\n", &list->buffer[i], i, list->buffer[i].next);
+		 }
+		 else
+		 {
+			 fprintf(GraphFile, "\"%p\" [color=\"#000080\", label=\"{%d|{%d|%u|%d}}\"];\n",
+				 &list->buffer[i], list->buffer[i].data, list->buffer[i].prev, i, list->buffer[i].next);
+		 }
+
+		 if (i < list->capacity)
+		 {
+			 fprintf(GraphFile, "edge[color=white]\n\"%p\"->\"%p\";\n", &list->buffer[i], &list->buffer[i + 1]);
+		 }
+	 }
+
+	 fprintf(GraphFile, "\"HEAD\" [color=\"#000080\", fillcolor=\"#C0C0FF\", label=\"{HEAD}\"];\n");
+
+	 fprintf(GraphFile, "edge[color=black]\n\"HEAD\"->\"%p\";\n", &list->buffer[list->head]);
+
+	 size_t live_index = list->head;
+	 while (live_index != list->tail)
+	 {
+		 if (list->buffer[live_index].next != 0)
+		 {
+			 fprintf(GraphFile, "edge[color=black]\n\"%p\"->\"%p\";\n", &list->buffer[live_index], &list->buffer[list->buffer[live_index].next]);
+			 live_index = list->buffer[live_index].next;
+		 }
+		 else break;
+	 }
+
+	 fprintf(GraphFile, "\"%p\"->\"HEAD\"", &list->buffer[list->tail]);
+
+	 fprintf(GraphFile, "}");
+
+	 fclose(GraphFile);
+
+	 if (list->capacity < 100)
+	 {
+		 system("dot -Tjpg list_graph.txt > RealList.jpg");
+		 system("start RealList.jpg");
+	 }
+ }
+
+ void listDoubleDump(List* list)
+ {
+	 if (list->capacity < 100)
+	 {
+		 listDumpReal(list);
+	 }
+	 if (list->size < 100)
+	 {
+		 listDumpLogical(list);
+	 }
  }
