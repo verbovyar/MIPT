@@ -24,6 +24,10 @@ typedef int elem_t;
 							reallocation(list);						\
 						}
 
+#define FREE_ELEMENT(arg) list->buffer[list->free].arg
+
+#define PUSH_ELEMENT(arg) list->buffer[push_idx].arg
+
 enum ListError {
 	NO_ERROR,
 	ERROR
@@ -34,8 +38,9 @@ enum NodeStatus {
 	USED
 };
 
-List* NewList			(size_t capacity);
+List* newList			(size_t capacity);
 ListError listOk		(List* list);
+
 void reallocation		(List* list);
 void listDump			(List* list);
 void listDumpReal		(List* list);

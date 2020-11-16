@@ -1,36 +1,114 @@
 digraph G{
 node [shape="record", style="filled", color="#008000", fillcolor="#C0FFC0"];
-"00A9EF30" [color="#000080", fillcolor="#C0C0FF", label="{HEAD}"];
-"00A9EF40" [label="{14|{0|1|2}}"]
-"00A9EF30"->"00A9EF40";
-"00A9EF40"->"00A9EF50";
-"00A9EF50" [label="{200|{1|2|3}}"]
-"00A9EF50"->"00A9EF40";
-"00A9EF50"->"00A9EF60";
-"00A9EF60" [label="{100|{2|3|4}}"]
-"00A9EF60"->"00A9EF50";
-"00A9EF60"->"00A9EF70";
-"00A9EF70" [label="{13|{3|4|5}}"]
-"00A9EF70"->"00A9EF60";
-"00A9EF70"->"00A9EF80";
-"00A9EF80" [label="{-100|{4|5|6}}"]
-"00A9EF80"->"00A9EF70";
-"00A9EF80"->"00A9EF90";
-"00A9EF90" [label="{-200|{5|6|7}}"]
-"00A9EF90"->"00A9EF80";
-"00A9EF90"->"00A9EFA0";
-"00A9EFA0" [label="{12|{6|7|8}}"]
-"00A9EFA0"->"00A9EF90";
-"00A9EFA0"->"00A9EFB0";
-"00A9EFB0" [label="{11|{7|8|9}}"]
-"00A9EFB0"->"00A9EFA0";
-"00A9EFB0"->"00A9EFC0";
-"00A9EFC0" [label="{10|{8|9|10}}"]
-"00A9EFC0"->"00A9EFB0";
-"00A9EFC0"->"00A9EFD0";
-"00A9EFD0" [label="{9|{9|10|11}}"]
-"00A9EFD0"->"00A9EFC0";
-"00A9EFD0"->"00A9EFE0";
-"00A9EFE0" [label="{5000|{10|11|0}}"]
-"00A9EFE0"->"00A9EF30";
-}
+"01419EA0" [color="#000080", label="{9|{2|1|12}}"];
+edge[color=white]
+"01419EA0"->"01419EB0";
+"01419EB0" [color="#000080", label="{10|{3|2|1}}"];
+edge[color=white]
+"01419EB0"->"01419EC0";
+"01419EC0" [color="#000080", label="{11|{11|3|2}}"];
+edge[color=white]
+"01419EC0"->"01419ED0";
+"01419ED0" [color="#000080", label="{12|{9|4|10}}"];
+edge[color=white]
+"01419ED0"->"01419EE0";
+"01419EE0" [color="#000080", label="{13|{6|5|8}}"];
+edge[color=white]
+"01419EE0"->"01419EF0";
+"01419EF0" [color="#000080", label="{14|{0|6|5}}"];
+edge[color=white]
+"01419EF0"->"01419F00";
+"01419F00" [fillcolor="#EFE28E", label="{FREE|{7|14}}"];
+edge[color=white]
+"01419F00"->"01419F10";
+"01419F10" [color="#000080", label="{-100|{5|8|9}}"];
+edge[color=white]
+"01419F10"->"01419F20";
+"01419F20" [color="#000080", label="{-200|{8|9|4}}"];
+edge[color=white]
+"01419F20"->"01419F30";
+"01419F30" [color="#000080", label="{200|{4|10|11}}"];
+edge[color=white]
+"01419F30"->"01419F40";
+"01419F40" [color="#000080", label="{100|{10|11|3}}"];
+edge[color=white]
+"01419F40"->"01419F50";
+"01419F50" [color="#000080", label="{5000|{1|12|0}}"];
+edge[color=white]
+"01419F50"->"01419F60";
+"01419F60" [fillcolor="#EFE28E", label="{FREE|{13|7}}"];
+edge[color=white]
+"01419F60"->"01419F70";
+"01419F70" [fillcolor="#EFE28E", label="{FREE|{14|15}}"];
+edge[color=white]
+"01419F70"->"01419F80";
+"01419F80" [fillcolor="#EFE28E", label="{FREE|{15|16}}"];
+edge[color=white]
+"01419F80"->"01419F90";
+"01419F90" [fillcolor="#EFE28E", label="{FREE|{16|17}}"];
+edge[color=white]
+"01419F90"->"01419FA0";
+"01419FA0" [fillcolor="#EFE28E", label="{FREE|{17|18}}"];
+edge[color=white]
+"01419FA0"->"01419FB0";
+"01419FB0" [fillcolor="#EFE28E", label="{FREE|{18|19}}"];
+edge[color=white]
+"01419FB0"->"01419FC0";
+"01419FC0" [fillcolor="#EFE28E", label="{FREE|{19|20}}"];
+edge[color=white]
+"01419FC0"->"01419FD0";
+"01419FD0" [fillcolor="#EFE28E", label="{FREE|{20|21}}"];
+edge[color=white]
+"01419FD0"->"01419FE0";
+"01419FE0" [fillcolor="#EFE28E", label="{FREE|{21|22}}"];
+edge[color=white]
+"01419FE0"->"01419FF0";
+"01419FF0" [fillcolor="#EFE28E", label="{FREE|{22|23}}"];
+edge[color=white]
+"01419FF0"->"0141A000";
+"0141A000" [fillcolor="#EFE28E", label="{FREE|{23|24}}"];
+edge[color=white]
+"0141A000"->"0141A010";
+"0141A010" [fillcolor="#EFE28E", label="{FREE|{24|25}}"];
+edge[color=white]
+"0141A010"->"0141A020";
+"0141A020" [fillcolor="#EFE28E", label="{FREE|{25|26}}"];
+edge[color=white]
+"0141A020"->"0141A030";
+"0141A030" [fillcolor="#EFE28E", label="{FREE|{26|27}}"];
+edge[color=white]
+"0141A030"->"0141A040";
+"0141A040" [fillcolor="#EFE28E", label="{FREE|{27|28}}"];
+edge[color=white]
+"0141A040"->"0141A050";
+"0141A050" [fillcolor="#EFE28E", label="{FREE|{28|29}}"];
+edge[color=white]
+"0141A050"->"0141A060";
+"0141A060" [fillcolor="#EFE28E", label="{FREE|{29|30}}"];
+edge[color=white]
+"0141A060"->"0141A070";
+"0141A070" [fillcolor="#EFE28E", label="{FREE|{30|0}}"];
+"HEAD" [color="#000080", fillcolor="#C0C0FF", label="{HEAD}"];
+edge[color=black]
+"HEAD"->"01419EF0";
+edge[color=black]
+"01419EF0"->"01419EE0";
+edge[color=black]
+"01419EE0"->"01419F10";
+edge[color=black]
+"01419F10"->"01419F20";
+edge[color=black]
+"01419F20"->"01419ED0";
+edge[color=black]
+"01419ED0"->"01419F30";
+edge[color=black]
+"01419F30"->"01419F40";
+edge[color=black]
+"01419F40"->"01419EC0";
+edge[color=black]
+"01419EC0"->"01419EB0";
+edge[color=black]
+"01419EB0"->"01419EA0";
+edge[color=black]
+"01419EA0"->"01419F50";
+"01419F50"->"HEAD"}
