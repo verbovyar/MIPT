@@ -1,4 +1,13 @@
-#include "list.h"								
+#include "list.h"	
+
+#define PUSH(place)			list->buffer[list->free].data = value;			\
+							list->buffer[list->free].next = list->place;	\
+							list->buffer[list->free].prev = 0;			
+
+#define PUSH_BEFORE_IDX		list->buffer[push_idx].node_status = USED;						\
+							list->buffer[push_idx].data = value;							\
+							list->buffer[push_idx].prev = list->buffer[real_idx + 1].prev;	\
+							list->buffer[push_idx].next = real_idx + 1;		
 
 struct ListNode {
 	elem_t data				= 0;
@@ -49,9 +58,7 @@ void pushHead(List* list, int64_t value)
 
 	REALLOCATION
 
-	++list->size;
-
-	if (list->size == 1)
+	if (list->size == 0)
 	{
 		list->buffer[1].data = value;
 		list->buffer[1].prev = 0;
@@ -62,25 +69,24 @@ void pushHead(List* list, int64_t value)
 	{
 		int32_t temp_free_idx = list->buffer[list->free].next;
 
-		list->buffer[list->free].data = value;
-		list->buffer[list->free].next = list->head;
-		list->buffer[list->free].prev = 0;
-		list->buffer[list->free].node_status = USED;
+		PUSH(head)
 		list->buffer[list->head].prev = list->free;
 		list->head = list->free;
 		list->free = temp_free_idx;
 	}
 
+	++list->size;
+
 	ASSERT(list)
 }
 
- int32_t findIdx(List* list, int32_t value)
+int32_t findIdx(List* list, int32_t phys_idx)
 {
 	assert(list != NULL);
 	ASSERT(list)
 
 	int idx = list->head;
-	for (int i = 0; i < value - 1; ++i)
+	for (int i = 0; i < phys_idx - 1; ++i)
 	{
 		idx = list->buffer[idx].next;
 	}
@@ -90,30 +96,27 @@ void pushHead(List* list, int64_t value)
 	ASSERT(list)
 }
 
- int32_t pushBeforeFindIdx(List* list, int64_t value, int32_t real_idx)
- {
-	 assert(list);
-	 ASSERT(list)
+int32_t pushBeforeIdx(List* list, int64_t value, int32_t real_idx)
+{
+	assert(list);
+	ASSERT(list)
 
-	 REALLOCATION
+	REALLOCATION
 
-	 ++list->size;
+	++list->size;
 
-	 int32_t temp_free_idx = list->buffer[list->free].next;
-	 int32_t push_idx = list->free;
+	int32_t temp_free_idx = list->buffer[list->free].next;
+	int32_t push_idx = list->free;
 
-	 list->buffer[push_idx].node_status = USED;
-	 list->buffer[push_idx].data = value;
-	 list->buffer[push_idx].prev = list->buffer[real_idx].prev;
-	 list->buffer[push_idx].next = real_idx;
-	 list->buffer[list->buffer[real_idx].prev].next = list->free;
-	 list->buffer[real_idx].prev = list->free;
-	 list->free = temp_free_idx;
+	PUSH_BEFORE_IDX
+	list->buffer[list->buffer[real_idx + 1].prev].next = list->free;
+	list->buffer[real_idx + 1].prev = list->free;
+   	list->free = temp_free_idx;
 
-	 ASSERT(list)
+	ASSERT(list)
 
-	 return push_idx;
- }
+	return push_idx;
+}
 
  void pushAfterIdx(List* list, int64_t value, int32_t idx)
  {
@@ -122,19 +125,7 @@ void pushHead(List* list, int64_t value)
 
 	 REALLOCATION
 
-	 pushInIdx(list, value, idx + 1);
-
-	 ASSERT(list)
- }
-
- void pushBeforeIdx(List* list, int64_t value, int32_t idx)
- {
-	 assert(list != NULL);
-	 ASSERT(list)
-
-	 REALLOCATION
-
-	 pushInIdx(list, value, idx - 1);
+	 pushBeforeIdx(list, value, idx + 1);
 
 	 ASSERT(list)
  }
@@ -150,9 +141,7 @@ void pushHead(List* list, int64_t value)
 
 	 int32_t temp_free_idx = list->buffer[list->free].next;
 
-	 list->buffer[list->free].data = value;
-	 list->buffer[list->free].prev = list->tail;
-	 list->buffer[list->free].next = 0;
+	 PUSH(tail)
 	 list->buffer[list->tail].next = list->free;
 	 list->tail = list->free;
 	 list->free = temp_free_idx;
@@ -230,7 +219,7 @@ void pushHead(List* list, int64_t value)
 
  void reallocation(List* list)
  {
-	 ListNode* temp = (ListNode*)realloc(list->buffer, list->capacity * INCREASE_FACTOR);
+	 list->buffer = (ListNode*)realloc(list->buffer, list->capacity * INCREASE_FACTOR);
  }
 
  void freeList(List* list)

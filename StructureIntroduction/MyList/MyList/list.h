@@ -34,24 +34,23 @@ enum NodeStatus {
 	USED
 };
 
-List* NewList		(size_t capacity);
-ListError listOk	(List* list);
-void reallocation	(List* list);
-void listDump		(List* list);
-void listDumpReal	(List* list);
-void listDumpLogical(List* list);
-void freeList		(List* list);
-void deleteNode		(List* list, int32_t idx);
+List* NewList			(size_t capacity);
+ListError listOk		(List* list);
+void reallocation		(List* list);
+void listDump			(List* list);
+void listDumpReal		(List* list);
+void listDumpLogical	(List* list);
+void freeList			(List* list);
+void deleteNode			(List* list, int32_t idx);
 
-int32_t pushBeforeFindIdx	(List* list, int64_t value, int32_t idx);
-void pushAfterIdx	(List* list, int64_t value, int32_t idx);
-void pushBeforeIdx	(List* list, int64_t value, int32_t idx);
-void pushHead		(List* list, int64_t value);
-void pushTail		(List* list, int64_t value);
+int32_t pushBeforeIdx	(List* list, int64_t value, int32_t idx);
+void pushAfterIdx		(List* list, int64_t value, int32_t idx);
+void pushHead			(List* list, int64_t value);
+void pushTail			(List* list, int64_t value);
 
-void popInIdx		(List* list, int32_t idx);
-void popHead		(List* list);
-void popTail		(List* list);
+void popInIdx			(List* list, int32_t idx);
+void popHead			(List* list);
+void popTail			(List* list);
 
-int32_t findIdx		(List* list, int32_t value);
-elem_t getValue		(List* list, int32_t idx);
+int32_t findIdx			(List* list, int32_t value);
+elem_t getValue			(List* list, int32_t idx);
