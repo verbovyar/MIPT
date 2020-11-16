@@ -1,60 +1,44 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <assert.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-const int max_str_size = 550;
+const int max_const = 1e9 + 1;
+const long long int del = 1000000000;
+const int start_result = -1;
 const int first_height = 2;
 const int second_height = -2;
-
-struct Map {
-  char* str1 = NULL;
-  char* str2 = NULL;
-};
-
-void WriteStrings(Map* map, char* str1, char* str2);
+int max = max_const;
 
 struct Node {
-  Map* key = NULL;
+  int key = NULL;
   Node* parent = NULL;
   Node* left = NULL;
   Node* right = NULL;
   unsigned int height = 0;
 };
 
-void WriteStrings(Map* map, char* str1, char* str2) {
-  map->str1 = (char*)calloc(max_str_size, sizeof(char));
-  strcpy(map->str1, str1);
-  map->str2 = (char*)calloc(max_str_size, sizeof(char));
-  strcpy(map->str2, str2);
-}
-
-inline int GetHeight(Node* node);
-inline void SetHeight(Node* node);
-
 struct Avl {
   Node* root = NULL;
   size_t size = 0;
 };
 
+inline int GetHeight(Node* node);
+inline void SetHeight(Node* node);
 Avl* NewAvl();
 void DeleteAvl(Avl* tree);
-
 void SmallLeft(Avl* tree, Node* node);
 void SmallRight(Avl* tree, Node* node);
 void BigLeft(Avl* tree, Node* node);
 void BigRight(Avl* tree, Node* node);
-Node* Find(Avl* tree, char* key);
-Node* FindSubtree(Node* subtree_root, char* key);
-
+Node* Find(Avl* tree, int key);
+Node* FindSubtree(Node* subtree_root, int key);
 int Balance(Node* node);
 void FixUp(Avl* tree, Node* node);
-
-void Insert(Avl* tree, Map* key);
+void Insert(Avl* tree, int key);
 
 inline int GetHeight(Node* node) { return node != NULL ? node->height : 0; }
 
@@ -68,7 +52,6 @@ Avl* NewAvl() {
   Avl* tree = (Avl*)calloc(1, sizeof(Avl));
   tree->root = (Node*)calloc(1, sizeof(Node));
   tree->size = 0;
-
   return tree;
 }
 
@@ -162,13 +145,12 @@ void FixUp(Avl* tree, Node* node) {
         SmallRight(tree, node);
       }
     }
-
     SetHeight(node);
     node = node->parent;
   }
 }
 
-void Insert(Avl* tree, Map* key) {
+void Insert(Avl* tree, int key) {
   Node* new_parent = nullptr;
   Node* new_leaf = tree->root;
   Node* node = (Node*)calloc(1, sizeof(Node));
@@ -180,7 +162,8 @@ void Insert(Avl* tree, Map* key) {
   } else {
     while (new_leaf != NULL) {
       new_parent = new_leaf;
-      if (strcmp(key->str1, new_leaf->key->str1) < 0) {
+
+      if (key < new_leaf->key) {
         new_leaf = new_leaf->left;
       } else {
         new_leaf = new_leaf->right;
@@ -190,61 +173,88 @@ void Insert(Avl* tree, Map* key) {
     node->parent = new_parent;
     if (!(new_parent == nullptr)) {
       tree->root = node;
-    } else if (strcmp(node->key->str1, new_parent->key->str1) < 0) {
+    } else if (node->key < new_parent->key) {
       new_parent->left = node;
     } else {
       new_parent->right = node;
     }
-
     FixUp(tree, node);
   }
-
   tree->size++;
 }
 
-Node* FindSubtree(Node* subtree_root, char* key) {
+Node* FindSubtree(Node* subtree_root, int key) {
   if (subtree_root == NULL) {
     return NULL;
   }
 
-  if (strcmp(key, subtree_root->key->str1) < 0) {
+  if (key < subtree_root->key) {
     return FindSubtree(subtree_root->left, key);
   }
 
-  if (strcmp(subtree_root->key->str1, key) < 0) {
+  if (subtree_root->key < key) {
     return FindSubtree(subtree_root->right, key);
   }
-
   return subtree_root;
 }
 
-Node* Find(Avl* tree, char* key) { return FindSubtree(tree->root, key); }
+Node* Find(Avl* tree, int key) { return FindSubtree(tree->root, key); }
+
+int UpperBoundInTree(Node* subtree_root, int key) {
+  if (subtree_root == NULL) {
+    return max;
+  }
+
+  if (key == subtree_root->key) {
+    max = subtree_root->key;
+    return max;
+  }
+
+  if (key < subtree_root->key) {
+    if (subtree_root->key < max) {
+      max = subtree_root->key;
+    }
+    UpperBoundInTree(subtree_root->left, key);
+  }
+
+  if (subtree_root->key < key) {
+    UpperBoundInTree(subtree_root->right, key);
+  }
+  return max;
+}
+
+int FindUpperBound(Avl* tree, int key) {
+  max = max_const;
+  return UpperBoundInTree(tree->root, key);
+}
 
 int main() {
+  Avl* tree = NewAvl();
+  int max = max_const;
+
   int count = 0;
   scanf("%d", &count);
 
-  char* str1 = (char*)calloc(max_str_size, sizeof(char));
-  char* str2 = (char*)calloc(max_str_size, sizeof(char));
-
-  Avl* tree = NewAvl();
+  char commmand = '\0';
+  int64_t number = 0;
+  int64_t result = start_result;
   for (int i = 0; i < count; ++i) {
-    scanf("%s%s", str1, str2);
-    Map* map1 = (Map*)calloc(1, sizeof(Map));
-    WriteStrings(map1, str1, str2);
-    Insert(tree, map1);
-    Map* map2 = (Map*)calloc(1, sizeof(Map));
-    WriteStrings(map2, str2, str1);
-    Insert(tree, map2);
-  }
+    scanf("\n%c %d", &commmand, &number);
 
-  printf("\n");
-
-  scanf("%d", &count);
-  for (int i = 0; i < count; ++i) {
-    scanf("%s", str1);
-    Node* node = Find(tree, str1);
-    printf("%s\n", node->key->str2);
+    if (commmand == '?') {
+      result = FindUpperBound(tree, number);
+      if (result == max_const) {
+        result = start_result;
+      }
+      printf("%d\n", result);
+    } else {
+      if (result == start_result) {
+        Insert(tree, number);
+      } else {
+        Insert(tree, ((number + result) % del));
+        result = start_result;
+      }
+    }
   }
 
   DeleteAvl(tree);
