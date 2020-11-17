@@ -24,10 +24,6 @@ typedef int elem_t;
 							reallocation(list);						\
 						}
 
-#define FREE_ELEMENT(arg) list->buffer[list->free].arg
-
-#define PUSH_ELEMENT(arg) list->buffer[push_idx].arg
-
 enum ListError {
 	NO_ERROR,
 	ERROR

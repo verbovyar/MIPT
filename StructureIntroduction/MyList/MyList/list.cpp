@@ -62,9 +62,11 @@ void pushHead(List* list, int64_t value)
 	{
 		int32_t temp_free_idx = list->buffer[list->free].next;
 
-		FREE_ELEMENT(data) = value;
-		FREE_ELEMENT(next) = list->head;
-		FREE_ELEMENT(prev) = 0;
+		ListNode* free_elem = &list->buffer[list->free];
+
+		free_elem->data = value;
+		free_elem->next = list->head;
+		free_elem->prev = 0;
 		list->buffer[list->head].prev = list->free;
 		list->head = list->free;
 		list->free = temp_free_idx;
@@ -101,10 +103,11 @@ int32_t pushBeforeIdx(List* list, int64_t value, int32_t real_idx)
 	int32_t temp_free_idx = list->buffer[list->free].next;
 	int32_t push_idx = list->free;
 
-	PUSH_ELEMENT(node_status) = USED;
-	PUSH_ELEMENT(data) = value;
-	PUSH_ELEMENT(prev) = list->buffer[real_idx].prev;
-	PUSH_ELEMENT(next) = real_idx;
+	ListNode* push_elem = &list->buffer[push_idx];
+
+	push_elem->data = value;
+	push_elem->prev = list->buffer[real_idx].prev;
+	push_elem->next = real_idx;
 	list->buffer[list->buffer[real_idx].prev].next = list->free;
 	list->buffer[real_idx].prev = list->free;
 	list->free = temp_free_idx;
@@ -121,7 +124,7 @@ void pushAfterIdx(List* list, int64_t value, int32_t idx)
 
 	REALLOCATION
 
-	pushBeforeIdx(list, value, idx - 1);
+	pushBeforeIdx(list, value, idx + 1);
 
 	ASSERT(list)
 }
@@ -137,9 +140,11 @@ void pushTail(List* list, int64_t value)
 
 	int32_t temp_free_idx = list->buffer[list->free].next;
 
-	FREE_ELEMENT(data) = value;
-	FREE_ELEMENT(prev) = list->tail;
-	FREE_ELEMENT(next) = 0;
+	ListNode* free_elem = &list->buffer[list->free];
+
+	free_elem->data = value;
+	free_elem->prev = list->tail;
+	free_elem->next = 0;
 	list->buffer[list->tail].next = list->free;
 	list->tail = list->free;
 	list->free = temp_free_idx;
