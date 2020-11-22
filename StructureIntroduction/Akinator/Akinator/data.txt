@@ -1,19 +1,13 @@
-"pet"
+alive
 {
-"bigger"
+cant jump
 {
-"cat"
+cat
 }
 {
-"dog"
+dog
 }
 }
 {
-"pc"
-{
-"gpu"
-}
-{
-"tv"
-}
+pc
 }

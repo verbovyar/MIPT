@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 
 const int START_POSITION = 1;
+const int WORD_MAX_LEN = 255;
 
 struct Line {
     char* string = NULL;
@@ -69,7 +70,9 @@ void saveNewFile        (Tree* tree, Node* node, FILE* data);
 void playGame           (Tree* tree, Node* node);
 void save               (Tree* tree);
 void getDifferendBetween(Node* node);
+void deleteSymbol       (char* string);
 bool isFind();
+//----
 
 int main()
 {
@@ -381,10 +384,10 @@ bool isFind()
 
 void getDifferendBetween(Node* node)
 {
-    char* new_word = (char*)calloc(1, sizeof(char));
+    char* new_word = (char*)calloc(WORD_MAX_LEN, sizeof(char));
     assert(new_word != NULL);
 
-    printf("Ok, what did you mean:");
+    printf("Ok, what did you mean?:");
 
     Node* new_word_leaf = (Node*)calloc(1, sizeof(Node));
     assert(new_word_leaf != NULL);
@@ -393,12 +396,13 @@ void getDifferendBetween(Node* node)
     new_word_leaf->data = new_word;
     new_word_leaf->parent = node;
 
-    printf("?");
     printf("\n");
-    printf("What differend between %s and %s", new_word, node->data);
+    printf("What differend between (%s) and (%s):", new_word, node->data);
 
-    char* new_data = (char*)calloc(1, sizeof(char));
-    scanf("%s", new_data);
+    char* new_data = (char*)calloc(WORD_MAX_LEN, sizeof(char));
+    scanf("\n");
+    fgets(new_data, WORD_MAX_LEN, stdin);
+    deleteSymbol(new_data);
 
     Node* new_leaf = (Node*)calloc(1, sizeof(Node));
     assert(new_leaf != NULL);
@@ -408,6 +412,17 @@ void getDifferendBetween(Node* node)
     node->data = new_data;
     node->right = new_leaf;
     node->left = new_word_leaf;
+}
+
+void deleteSymbol(char* string)
+{
+    int idx = 0;
+    while (string[idx] != '\n')
+    {
+        ++idx;
+    }
+
+    string[idx] = '\0';
 }
 
 void save(Tree* tree)
@@ -434,7 +449,7 @@ void saveNewFile(Tree* tree, Node* node, FILE* data)
     assert(tree);
     assert(node);
 
-    fprintf(data, "\"%s\"\n", node->data);
+    fprintf(data, "%s\n", node->data);
     if (node->right != NULL)
     {
         fprintf(data, "{\n");
