@@ -1,0 +1,22 @@
+digraph G{
+node [shape="record", style="solid", color="green"];
+"006D0F50" [label="{{par: 00000000|ptr: 006D0F50}|{str: pet}|{l:006D0FD0|r:006D0F90}}"]
+ "006D0FD0" [label="{{par: 006D0F50|ptr: 006D0FD0}|{str: pc}|{l:006D1050|r:006D1010}}"]
+ "006D1050" [label="{{par: 006D0FD0|ptr: 006D1050}|{str: tv}|{l:00000000|r:00000000}}"]
+ edge[color=orange]
+"006D0FD0":sw->"006D1050";
+"006D1010" [label="{{par: 006D0FD0|ptr: 006D1010}|{str: gpu}|{l:00000000|r:00000000}}"]
+ edge[color=red]
+"006D0FD0":se->"006D1010";
+edge[color=orange]
+"006D0F50":sw->"006D0FD0";
+"006D0F90" [label="{{par: 006D0F50|ptr: 006D0F90}|{str: bigger}|{l:006D31E8|r:006D3428}}"]
+ "006D31E8" [label="{{par: 006D0F90|ptr: 006D31E8}|{str: dog}|{l:00000000|r:00000000}}"]
+ edge[color=orange]
+"006D0F90":sw->"006D31E8";
+"006D3428" [label="{{par: 006D0F90|ptr: 006D3428}|{str: cat}|{l:00000000|r:00000000}}"]
+ edge[color=red]
+"006D0F90":se->"006D3428";
+edge[color=red]
+"006D0F50":se->"006D0F90";
+}
