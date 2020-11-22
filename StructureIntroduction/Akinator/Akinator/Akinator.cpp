@@ -82,6 +82,9 @@ int main()
 
     printf("Hello! My name is Akinator, I can predict some words!\n\n");
 
+    printf("Instruction: (+) - yes\n"
+           "             (-) - no \n\n");
+
     printf("Main menu: 1-Start game     \n"
            "           2-Give definition\n"
            "           3-Draw tree      \n"
@@ -120,7 +123,6 @@ void doCommand(Text* text, Tree* tree)
         case(second):
         {
             findWordDefinition(tree);
-            printf("\n");
 
             break;
         }
@@ -358,6 +360,7 @@ void playGame(Tree* tree, Node* node)
         else
         {
             getDifferendBetween(node);
+            printf("Ok, now i know you word!\n\n");
             tree->change = true;
         }
 

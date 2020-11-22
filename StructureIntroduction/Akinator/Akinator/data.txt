@@ -36,10 +36,22 @@ can swim
 {
 have tail
 {
+dangerous
+{
+crocodile
+}
+{
 spiderman
+}
+}
+{
+can fly and swim
+{
+duck
 }
 {
 fish
+}
 }
 }
 {
@@ -83,7 +95,13 @@ mobile
 laptope
 }
 {
+can ring
+{
+telephone
+}
+{
 pc
+}
 }
 }
 }
