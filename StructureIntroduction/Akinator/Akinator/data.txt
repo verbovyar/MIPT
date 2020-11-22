@@ -12,7 +12,35 @@ frog
 {
 lazy
 {
+slow
+{
+sloth
+}
+{
 panda
+}
+}
+{
+have wings
+{
+can speak
+{
+parrot
+}
+{
+bird
+}
+}
+{
+can swim
+{
+have tail
+{
+spiderman
+}
+{
+fish
+}
 }
 {
 cat
@@ -20,10 +48,18 @@ cat
 }
 }
 }
+}
+}
 {
 detail
 {
+can type
+{
+keyboard
+}
+{
 gpu
+}
 }
 {
 can work
@@ -33,10 +69,22 @@ mouse
 {
 can fly
 {
+is paper
+{
+kite
+}
+{
 plane
+}
+}
+{
+mobile
+{
+laptope
 }
 {
 pc
+}
 }
 }
 }

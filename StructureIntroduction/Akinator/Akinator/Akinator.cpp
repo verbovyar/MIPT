@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include "stack.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -10,6 +11,7 @@
 
 const int START_POSITION = 1;
 const int WORD_MAX_LEN = 255;
+const int START_STACK_SIZE = 50000;
 
 struct Line {
     char* string = NULL;
@@ -23,12 +25,7 @@ struct Text {
     Line* lines        = NULL;
 };
 
-struct Node {
-    char* data = NULL;
-    Node* left = NULL;
-    Node* right = NULL;
-    Node* parent = NULL;
-};
+
 
 struct Tree {
     Node* root  = NULL;
@@ -68,10 +65,14 @@ void graphvizBST(Tree* bst);
 //----
 void saveNewFile        (Tree* tree, Node* node, FILE* data);
 void playGame           (Tree* tree, Node* node);
+void putInStack         (Tree* tree, Node* node);
+Node* findWord          (Tree* tree, Node* node, char* definition);
 void save               (Tree* tree);
+void findWordDefinition (Tree* tree);
 void getDifferendBetween(Node* node);
+void writeDefinition    (Stack* stack, Node* node);
 void deleteSymbol       (char* string);
-bool isFind();
+bool isfindWord();
 //----
 
 int main()
@@ -85,7 +86,7 @@ int main()
            "           2-Give definition\n"
            "           3-Draw tree      \n"
            "           4-Save           \n"
-           "           5-Exit           \n\n");
+           "           5-Exit           \n");
 
     doCommand(text, tree);
 
@@ -118,6 +119,9 @@ void doCommand(Text* text, Tree* tree)
         }
         case(second):
         {
+            findWordDefinition(tree);
+            printf("\n");
+
             break;
         }
         case(third):
@@ -296,11 +300,11 @@ Node* loadNodes(FILE* file, Node* node)
 {
     if (node->right != NULL && node->left != NULL)
     {
-        fprintf(file, "\"%p\"[shape=\"record\", label=\"%s?\"]\n", node, node->data);
+        fprintf(file, "\"%p\"[shape=\"ellipse\", label=\"%s?\"]\n", node, node->data);
     }
     else
     {
-        fprintf(file, "\"%p\"[shape=\"pentagon\", label=\"%s\"]\n", node, node->data);
+        fprintf(file, "\"%p\"[shape=\"septagon\", label=\"%s\"]\n", node, node->data);
     }
 
     if (node == nullptr)
@@ -347,7 +351,7 @@ void playGame(Tree* tree, Node* node)
         printf("Is it your word:%s?", node->data);
         printf("\n");
 
-        if (isFind())
+        if (isfindWord())
         {
             printf("So cool!\n");
         }
@@ -362,7 +366,7 @@ void playGame(Tree* tree, Node* node)
     
     printf("Is it:%s?\n", node->data);
 
-    bool answer = isFind();
+    bool answer = isfindWord();
 
     if (answer)
     {
@@ -374,7 +378,7 @@ void playGame(Tree* tree, Node* node)
     }
 }
 
-bool isFind()
+bool isfindWord()
 {
     char* answer = (char*)calloc(1, sizeof(char));
     assert(answer != NULL);
@@ -403,12 +407,14 @@ void getDifferendBetween(Node* node)
     new_word_leaf->parent = node;
 
     printf("\n");
-    printf("What differend between (%s) and (%s):", new_word, node->data);
+    printf("What different between (%s) and (%s):", new_word, node->data);
 
     char* new_data = (char*)calloc(WORD_MAX_LEN, sizeof(char));
     scanf("\n");
     fgets(new_data, WORD_MAX_LEN, stdin);
     deleteSymbol(new_data);
+
+    printf("\n");
 
     Node* new_leaf = (Node*)calloc(1, sizeof(Node));
     assert(new_leaf != NULL);
@@ -442,11 +448,11 @@ void save(Tree* tree)
         fclose(DataFile);
 
         tree->change = false;
-        printf("New file was changed\n");
+        printf("Your file was changed\n\n");
     }
     else
     {
-        printf("No changes in your file\n");
+        printf("No changes in your file\n\n");
     }
 }
 
@@ -469,4 +475,91 @@ void saveNewFile(Tree* tree, Node* node, FILE* data)
         saveNewFile(tree, node->left, data);
         fprintf(data, "}\n");
     }
+}
+
+void findWordDefinition(Tree* tree)
+{
+    assert(tree != NULL);
+
+    printf("Enter word:");
+    char* word = (char*)calloc(WORD_MAX_LEN, sizeof(char));
+    scanf("%s", word);
+
+    Node* find_node = findWord(tree, tree->root, word);
+
+    if (find_node == NULL)
+    {
+        printf("I cant find this word\n");
+    }
+    else
+    {
+        putInStack(tree, find_node);
+        printf("\n\n");
+    }
+}
+
+Node* findWord(Tree* tree, Node* node, char* definition)
+{
+    if (node == NULL)
+    {
+        return NULL;
+    }
+
+    if (strcmp(node->data, definition) == 0 && node->right == NULL && node->left == NULL)
+    {
+        return node;
+    }
+
+    Node* find_node = findWord(tree, node->left, definition);
+    if (find_node != NULL)
+    {
+        return find_node;
+    }
+
+    return findWord(tree, node->right, definition);
+}
+
+void putInStack(Tree* tree, Node* node)
+{
+    assert(tree != NULL);
+    assert(node != NULL);
+
+    printf("%s-> ", node->data);
+
+    Stack* stack = newStack(START_STACK_SIZE);
+    while (node != NULL)
+    {
+        push(stack, node);
+        node = node->parent;
+    }
+    pop(stack);
+
+    writeDefinition(stack, tree->root);
+
+    deleteStack(stack);
+}
+
+void writeDefinition(Stack* stack, Node* node)
+{
+    assert(stack != NULL);
+    assert(node != NULL);
+
+    if (stack->size_ == 0)
+    {
+        return;
+    }
+
+    Node* find_node = top(stack);
+    pop(stack);
+
+    if (find_node == node->right)
+    {
+        printf("(%s) ", node->data);
+    }
+    else
+    {
+        printf("(not %s) ", node->data);
+    }
+
+    writeDefinition(stack, find_node);
 }
