@@ -1,13 +1,43 @@
 alive
 {
-cant jump
-{
-cat
-}
+can bark
 {
 dog
 }
+{
+green and small
+{
+frog
+}
+{
+lazy
+{
+panda
+}
+{
+cat
+}
+}
+}
+}
+{
+detail
+{
+gpu
+}
+{
+can work
+{
+mouse
+}
+{
+can fly
+{
+plane
 }
 {
 pc
+}
+}
+}
 }

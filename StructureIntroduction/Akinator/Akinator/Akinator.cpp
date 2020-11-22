@@ -294,8 +294,14 @@ bool myIsAlphabet(char symbol)
 
 Node* loadNodes(FILE* file, Node* node)
 {
-    fprintf(file, "\"%p\" [label=\"{{par: %p|ptr: %p}|{str: %s}|{l:%p|r:%p}}\"]\n ", node, (node->parent), node,
-        (char*)(node->data), node->left, node->right); // <-- label printing
+    if (node->right != NULL && node->left != NULL)
+    {
+        fprintf(file, "\"%p\"[shape=\"record\", label=\"%s?\"]\n", node, node->data);
+    }
+    else
+    {
+        fprintf(file, "\"%p\"[shape=\"pentagon\", label=\"%s\"]\n", node, node->data);
+    }
 
     if (node == nullptr)
     {
@@ -410,8 +416,8 @@ void getDifferendBetween(Node* node)
     new_leaf->data = node->data;
     new_leaf->parent = node;
     node->data = new_data;
-    node->right = new_leaf;
-    node->left = new_word_leaf;
+    node->left = new_leaf;
+    node->right = new_word_leaf;
 }
 
 void deleteSymbol(char* string)
