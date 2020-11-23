@@ -25,8 +25,6 @@ struct Text {
     Line* lines        = NULL;
 };
 
-
-
 struct Tree {
     Node* root  = NULL;
     bool change = true;
@@ -37,7 +35,8 @@ enum Commands {
     second = 2,
     third  = 3,
     fourth = 4,
-    fifth  = 5
+    fifth  = 5,
+    sixth  = 6
 };
 
 //----
@@ -65,12 +64,14 @@ void graphvizBST(Tree* bst);
 //----
 void saveNewFile        (Tree* tree, Node* node, FILE* data);
 void playGame           (Tree* tree, Node* node);
-void putInStack         (Tree* tree, Node* node);
+void putInStack         (Tree* tree, Node* node, Stack* stack);
 Node* findWord          (Tree* tree, Node* node, char* definition);
 void save               (Tree* tree);
 void findWordDefinition (Tree* tree);
+void comparator         (Tree* tree);
 void getDifferendBetween(Node* node);
 void writeDefinition    (Stack* stack, Node* node);
+void writeDifferent     (Stack* stk1, char* first, Stack* stk2, char* second);
 void deleteSymbol       (char* string);
 bool isfindWord();
 //----
@@ -87,9 +88,10 @@ int main()
 
     printf("Main menu: 1-Start game     \n"
            "           2-Give definition\n"
-           "           3-Draw tree      \n"
-           "           4-Save           \n"
-           "           5-Exit           \n");
+           "           3-Compare words  \n"
+           "           4-Draw tree      \n"
+           "           5-Save           \n"
+           "           6-Exit           \n");
 
     doCommand(text, tree);
 
@@ -99,13 +101,13 @@ int main()
 void doCommand(Text* text, Tree* tree)
 {
     int command = 0;
-    while (command != fifth)
+    while (command != sixth)
     {
         printf("Select a number to continue:");
         scanf("%d", &command);
         printf("\n");
     
-        while (command < first || command > fifth)
+        while (command < first || command > sixth)
         {
             printf("Wrong input! Enter correct number of command:");
             scanf("%d", &command);
@@ -114,36 +116,43 @@ void doCommand(Text* text, Tree* tree)
 
         switch (command)
         {
-        case(first):
-        {
-            playGame(tree, tree->root);
+            case(first):
+            {
+                playGame(tree, tree->root);
 
-            break;
-        }
-        case(second):
-        {
-            findWordDefinition(tree);
+                break;
+            }
+            case(second):
+            {
+                printf("Enter word:");
+                findWordDefinition(tree);
 
-            break;
-        }
-        case(third):
-        {
-            graphvizBST(tree);
+                break;
+            }
+            case(third):
+            {
+                comparator(tree);
 
-            break;
-        }
-        case(fourth):
-        {
-            save(tree);
+                break;
+            }
+            case(fourth):
+            {
+                graphvizBST(tree);
 
-            break;
-        }
-        case(fifth):
-        {
-            printf("Closing game, thank you and goodbye!\n");
+                break;
+            }
+            case(fifth):
+            {
+                save(tree);
 
-            break;
-        }
+                break;
+            }
+            case(sixth):
+            {
+                printf("Closing game, thank you and goodbye!\n");
+
+                break;
+            }
         }
     
     }
@@ -346,7 +355,7 @@ void graphvizBST(Tree* bst)
     system("start dump.jpg");
 }
 
-void playGame(Tree* tree, Node* node)
+void playGame(Tree* tree, Node* node)// ??????? ????
 {
     if (node->left == NULL || node->right == NULL)
     {
@@ -360,7 +369,7 @@ void playGame(Tree* tree, Node* node)
         else
         {
             getDifferendBetween(node);
-            printf("Ok, now i know you word!\n\n");
+            printf("Ok, now i know your word!\n\n");
             tree->change = true;
         }
 
@@ -484,7 +493,6 @@ void findWordDefinition(Tree* tree)
 {
     assert(tree != NULL);
 
-    printf("Enter word:");
     char* word = (char*)calloc(WORD_MAX_LEN, sizeof(char));
     scanf("%s", word);
 
@@ -496,7 +504,11 @@ void findWordDefinition(Tree* tree)
     }
     else
     {
-        putInStack(tree, find_node);
+        Stack* stack = newStack(START_STACK_SIZE);
+        putInStack(tree, find_node, stack);
+        printf("%s-> ", find_node->data);
+        writeDefinition(stack, tree->root);
+        deleteStack(stack);
         printf("\n\n");
     }
 }
@@ -522,24 +534,17 @@ Node* findWord(Tree* tree, Node* node, char* definition)
     return findWord(tree, node->right, definition);
 }
 
-void putInStack(Tree* tree, Node* node)
+void putInStack(Tree* tree, Node* node, Stack* stack)
 {
     assert(tree != NULL);
     assert(node != NULL);
 
-    printf("%s-> ", node->data);
-
-    Stack* stack = newStack(START_STACK_SIZE);
     while (node != NULL)
     {
         push(stack, node);
         node = node->parent;
     }
     pop(stack);
-
-    writeDefinition(stack, tree->root);
-
-    deleteStack(stack);
 }
 
 void writeDefinition(Stack* stack, Node* node)
@@ -565,4 +570,84 @@ void writeDefinition(Stack* stack, Node* node)
     }
 
     writeDefinition(stack, find_node);
+}
+
+void comparator(Tree* tree)
+{
+    printf("first word:");
+    char* first = (char*)calloc(WORD_MAX_LEN, sizeof(char));
+    scanf("%s", first);
+    printf("\n");
+
+    Node* find_node1 = findWord(tree, tree->root, first);
+
+    if (find_node1 == NULL)
+    {
+        printf("I cant find this word\n");
+
+        return;
+    }
+    Stack* stk1 = newStack(START_STACK_SIZE);
+    putInStack(tree, find_node1, stk1);
+
+    printf("second word:");
+    char* second = (char*)calloc(WORD_MAX_LEN, sizeof(char));
+    scanf("%s", second);
+
+    Node* find_node2 = findWord(tree, tree->root, second);
+
+    if (find_node2 == NULL)
+    {
+        printf("I cant find this word\n");
+
+        return;
+    }
+    Stack* stk2 = newStack(START_STACK_SIZE);
+    putInStack(tree, find_node2, stk2);
+
+    writeDifferent(stk1, first, stk2, second);
+
+    deleteStack(stk1);
+    deleteStack(stk2);
+}
+
+void writeDifferent(Stack* stk1, char* first, Stack* stk2, char* second)
+{
+    Node* start_node = top(stk1);
+
+    pop(stk1);
+    Node* first_tag = top(stk1);
+    pop(stk2);
+    Node* second_tag = top(stk2);
+    if (first_tag == second_tag)
+    {
+        printf("\nidentical tags:\n");
+        while (top(stk1) == top(stk2) && (stk1->size_ != 0 && stk2->size_ != 0))
+        {
+            Node* next_node = top(stk1);
+            pop(stk1);
+            pop(stk2);
+            if (next_node == start_node->right)
+            {
+                printf("(%s) ", start_node->data);
+            }
+            else
+            {
+                printf("(not %s) ", start_node->data);
+            }
+            start_node = next_node;
+        }
+    }
+
+    printf("\n\ndifferent tags:\n");
+
+    printf("%s->", first);
+    writeDefinition(stk1, start_node);
+
+    printf("\n");
+
+    printf("%s->", second);
+    writeDefinition(stk2, start_node);
+
+    printf("\n\n");
 }

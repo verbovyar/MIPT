@@ -55,7 +55,13 @@ fish
 }
 }
 {
+like cold
+{
+penguin
+}
+{
 cat
+}
 }
 }
 }
@@ -70,13 +76,25 @@ can type
 keyboard
 }
 {
+slow
+{
+cpu
+}
+{
 gpu
+}
 }
 }
 {
 can work
 {
+can drive
+{
+car
+}
+{
 mouse
+}
 }
 {
 can fly
@@ -86,13 +104,25 @@ is paper
 kite
 }
 {
+has blades
+{
+helicopter
+}
+{
 plane
+}
 }
 }
 {
 mobile
 {
+can listen to music
+{
+headphones
+}
+{
 laptope
+}
 }
 {
 can ring
@@ -100,7 +130,19 @@ can ring
 telephone
 }
 {
+mechanic
+{
+clock
+}
+{
+blue
+{
+pen
+}
+{
 pc
+}
+}
 }
 }
 }
