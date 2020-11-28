@@ -1,0 +1,22 @@
+digraph G{
+node [shape="record", style="solid", color="green"];
+"007FA428" [label="{{par: root}|{str: 5}|{H: 4}}"]
+ edge[color=orange]
+"007FA428":sw->"007FA328";
+"007FA328" [label="{{par: 007FA428|ptr: 007FA328}|{str: 1}|{H: 2}|{l:007F5AA0|r:007FA368}}"]
+ edge[color=orange]
+"007FA328":sw->"007F5AA0";
+"007F5AA0" [label="{{par: 007FA328|ptr: 007F5AA0}|{str: 0}|{H: 1}|{l:00000000|r:00000000}}"]
+ edge[color=red]
+"007FA328":se->"007FA368";
+"007FA368" [label="{{par: 007FA328|ptr: 007FA368}|{str: 2}|{H: 1}|{l:00000000|r:00000000}}"]
+ edge[color=red]
+"007FA428":se->"007FAB90";
+"007FAB90" [label="{{par: 007FA428|ptr: 007FAB90}|{str: 8}|{H: 3}|{l:007FA468|r:007FA810}}"]
+ edge[color=orange]
+"007FAB90":sw->"007FA468";
+"007FA468" [label="{{par: 007FAB90|ptr: 007FA468}|{str: 6}|{H: 1}|{l:00000000|r:00000000}}"]
+ edge[color=red]
+"007FAB90":se->"007FA810";
+"007FA810" [label="{{par: 007FAB90|ptr: 007FA810}|{str: 9}|{H: 1}|{l:00000000|r:00000000}}"]
+ }
