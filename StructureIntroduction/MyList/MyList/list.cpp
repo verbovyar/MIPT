@@ -9,6 +9,7 @@ struct ListNode {
 
 struct List {
 	ListNode* buffer = NULL;
+	bool is_sorted = false;
 	int32_t head = 0;
 	int32_t tail = 0;
 	int32_t free = 0;
@@ -75,20 +76,28 @@ void pushHead(List* list, int64_t value)
 	ASSERT(list)
 }
 
-int32_t findIdx(List* list, int32_t value)
+int32_t findIdx(List* list, int32_t logic_idx)
 {
 	assert(list != NULL);
 	ASSERT(list)
 
-	int idx = list->head;
-	for (int i = 0; i < value - 1; ++i)
+	int real_idx = 0;
+	if (list->is_sorted == true)
 	{
-		idx = list->buffer[idx].next;
+		real_idx = logic_idx;
+	}
+	else
+	{
+		real_idx = list->head;
+		for (int i = 0; i < logic_idx - 1; ++i)
+		{
+			real_idx = list->buffer[real_idx].next;
+		}
 	}
 
 	ASSERT(list)
 
-	return idx;
+	return real_idx;
 }
 
 int32_t pushBeforeIdx(List* list, int64_t value, int32_t real_idx)
@@ -111,6 +120,7 @@ int32_t pushBeforeIdx(List* list, int64_t value, int32_t real_idx)
 	list->buffer[list->buffer[real_idx].prev].next = list->free;
 	list->buffer[real_idx].prev = list->free;
 	list->free = temp_free_idx;
+	list->is_sorted = false;
 
 	ASSERT(list)
 
@@ -124,7 +134,7 @@ void pushAfterIdx(List* list, int64_t value, int32_t idx)
 
 	REALLOCATION
 
-	pushBeforeIdx(list, value, idx + 1);
+	pushBeforeIdx(list, value, idx - 1);
 
 	ASSERT(list)
 }
@@ -309,6 +319,7 @@ void logicSort(List* list)
 	}
 
 	list->buffer[list->capacity].next = 0;
+	list->is_sorted = true;
 	free(buffer);
 }
 
