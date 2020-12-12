@@ -120,7 +120,10 @@ int32_t pushBeforeIdx(List* list, int64_t value, int32_t real_idx)
 	list->buffer[list->buffer[real_idx].prev].next = list->free;
 	list->buffer[real_idx].prev = list->free;
 	list->free = temp_free_idx;
+
 	list->is_sorted = false;
+
+	sortingCheck(list);
 
 	ASSERT(list)
 
@@ -190,17 +193,19 @@ void popTail(List* list)
 	ASSERT(list)
 }
 
-void popInIdx(List* list, int32_t real_idx)
+void popInIdx(List* list, int32_t idx)
 {
 	assert(list != NULL);
 	ASSERT(list)
 
 	--list->size;
 
-	list->buffer[list->buffer[real_idx].prev].next = list->buffer[real_idx].next;
-	list->buffer[list->buffer[real_idx].next].prev = list->buffer[real_idx].prev;
+	list->buffer[list->buffer[idx].prev].next = list->buffer[idx].next;
+	list->buffer[list->buffer[idx].next].prev = list->buffer[idx].prev;
 
-	deleteNode(list, real_idx);
+	list->is_sorted = false;
+
+	deleteNode(list, idx);
 
 	ASSERT(list)
 }
@@ -288,6 +293,14 @@ void listDump(List* list)
 	}
 
 	fclose(log_file);
+}
+
+void sortingCheck(List* list)
+{
+	if (!list->is_sorted)
+	{
+		logicSort(list);
+	}
 }
 
 void logicSort(List* list)
