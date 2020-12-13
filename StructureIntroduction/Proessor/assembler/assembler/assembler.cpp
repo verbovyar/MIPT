@@ -3,6 +3,9 @@
 #include "assembler.h"
 
 const char* DELIMETER = " ;\t";
+const int RAM_MODE = 5;
+const int SUM = 404;
+const int DEC = 505;
 
 void getByteCode(const char* name)
 {
@@ -170,37 +173,55 @@ void linesConstruct(comandsList* comands)
 const char* registers[] = { "rax", "rbx", "rcx", "rdx" };
 void addArgument(const char* token, Label* label, int lab_ind, char* code_buffer, comandsList* comands)
 {
-    double numb = 0;
+        double numb = 0;
 
-    if (sscanf(token, "%lf", &numb))
-    {
-        ++comands->ofs;
-        code_buffer[comands->ofs] = 0;
-        *(double*)(code_buffer + comands->ofs + 1) = numb;
-        comands->ofs += sizeof(double);
-    }
-    else if (myIsAlphabet(*token))
-    {
-        int i = 0;
-        while (i < MAX_LABLE_ARRAY_SIZE && label[i].lab_name != NULL && strcmp(token, label[i].lab_name) != 0)
+        if (sscanf(token, "%lf", &numb))
         {
-            ++i;
+            ++comands->ofs;
+            code_buffer[comands->ofs] = 0;
+            *(double*)(code_buffer + comands->ofs + 1) = numb;
+            comands->ofs += sizeof(double);
         }
-        //printf("[%d] %s\n", label[i].pc, label[i].lab_name);
-        *(int*)(code_buffer + comands->ofs + 1) = label[i].pc;
-        comands->ofs += sizeof(int);
-    }
-    else
-    {
-        for (int index = 0; index < REGISTERS_COUNT; ++index)
+        else if (myIsAlphabet(*token))
         {
-            if (strcmp(token, registers[index]) == 0)
+            int i = 0;
+            while (i < MAX_LABLE_ARRAY_SIZE && label[i].lab_name != NULL && strcmp(token, label[i].lab_name) != 0)
+            {
+                ++i;
+            }
+            //printf("[%d] %s\n", label[i].pc, label[i].lab_name);
+            *(int*)(code_buffer + comands->ofs + 1) = label[i].pc;
+            comands->ofs += sizeof(int);
+        }
+        else
+        {
+            if (token == "[")
             {
                 ++comands->ofs;
-                code_buffer[comands->ofs] = index + 1;
+                code_buffer[comands->ofs] = RAM_MODE;
+            }
+            else if (token == "+")
+            {
+                ++comands->ofs;
+                code_buffer[comands->ofs] = SUM;
+            }
+            else if (token == "-")
+            {
+                ++comands->ofs;
+                code_buffer[comands->ofs] = DEC;
+            }
+            else
+            {
+                for (int index = 0; index < REGISTERS_COUNT; ++index)
+                {
+                    if (strcmp(token, registers[index]) == 0)
+                    {
+                        ++comands->ofs;
+                        code_buffer[comands->ofs] = index + 1;
+                    }
+                }
             }
         }
-    }
 }
 
 bool myIsAlphabet(const char symbol)
