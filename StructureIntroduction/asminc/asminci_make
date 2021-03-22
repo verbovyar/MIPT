@@ -1,0 +1,11 @@
+run: write_console.out
+	./write_console.out
+
+write_console.out: write_console_asm.o write_console_cpp.o
+	gcc -no-pie write_console_asm.o write_console_cpp.o -o write_console.out
+
+write_console_asm.o: write_console.asm 
+	nasm -f elf64 write_console.asm -o write_console_asm.o
+
+write_console_cpp.o: write_console.cpp 
+	g++ -c write_console.cpp -o write_console_cpp.o
