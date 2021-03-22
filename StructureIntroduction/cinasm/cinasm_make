@@ -1,0 +1,10 @@
+run: cinasm.out 
+	./cinasm.out
+
+cinasm.out: cinasm.asm
+	
+cinasm.o: cinasm.asm
+	nasm -f elf64 cinasm.asm -o cinasm.o
+	
+cinasm.out: cinasm.o
+	gcc -no-pie cinasm.o -o cinasm.out
