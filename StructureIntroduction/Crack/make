@@ -1,0 +1,10 @@
+run: crack.out 
+	./crack.out
+
+crack.out: crack.asm
+	
+crack.o: crack.asm
+	nasm -f elf64 crack.asm -o crack.o
+	
+crack.out: crack.o
+	gcc -no-pie crack.o -o crack.out

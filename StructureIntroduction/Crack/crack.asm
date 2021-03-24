@@ -27,7 +27,7 @@ Scanf:
 
         cmp byte [r9], 0x0a
         jne Scanf
-;-------------------------------
+
         mov r8, CorrectPasswordBuf
         mov r9, UserPasswordBuffer
 

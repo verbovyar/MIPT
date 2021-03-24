@@ -1,0 +1,88 @@
+     1                                  global _start
+     2                                  
+     3                                  section .data
+     4                                  
+     5                                  user_password          equ 128
+     6                                  right_password         equ 5
+     7                                  count_of_smbls         equ 1
+     8                                  correct_password_len   equ 17
+     9                                  incorrect_password_len equ 19
+    10                                  
+    11                                  section .text
+    12                                  
+    13                                  ;nasm -f elf64 -l crack.lst crack.asm && ld -s -o crack  crack.o && ./crack
+    14                                  
+    15                                  _start:
+    16 00000000 49B9-                           mov r9, UserPasswordBuffer
+    16 00000002 [2600000000000000] 
+    17 0000000A 49FFC9                          dec r9
+    18                                  
+    19                                  Scanf:  
+    20 0000000D 49FFC1                          inc r9
+    21                                  
+    22 00000010 B800000000                      mov rax, 0
+    23 00000015 BF00000000                      mov rdi, 0
+    24 0000001A 4C89CE                          mov rsi, r9
+    25 0000001D BA01000000                      mov rdx, count_of_smbls
+    26 00000022 0F05                            syscall
+    27                                  
+    28 00000024 4180390A                        cmp byte [r9], 0x0a
+    29 00000028 75E3                            jne Scanf
+    30                                  ;-------------------------------
+    31 0000002A 49B8-                           mov r8, CorrectPasswordBuf
+    31 0000002C [A600000000000000] 
+    32 00000034 49B9-                           mov r9, UserPasswordBuffer
+    32 00000036 [2600000000000000] 
+    33                                  
+    34 0000003E 4831C9                          xor rcx, rcx
+    35                                  
+    36                                  MyLoop:
+    37 00000041 458A10                          mov r10b, byte [r8]
+    38 00000044 458A19                          mov r11b, byte [r9]
+    39                                  
+    40 00000047 49FFC0                          inc r8
+    41 0000004A 49FFC1                          inc r9
+    42                                  
+    43 0000004D 48FFC1                          inc rcx
+    44                                  
+    45 00000050 4538DA                          cmp r10b, r11b
+    46 00000053 74EC                            je MyLoop
+    47                                  
+    48 00000055 4883F905                        cmp rcx, right_password
+    49 00000059 7411                            je CorrectPassword
+    50                                  
+    51                                  IncorrectPasword:
+    52 0000005B 48BE-                           mov rsi, IncorrectMsg
+    52 0000005D [1200000000000000] 
+    53 00000065 BA13000000                      mov rdx, incorrect_password_len
+    54 0000006A EB0F                            jmp WriteMsg
+    55                                  
+    56                                  CorrectPassword:
+    57 0000006C 48BE-                           mov rsi, CorrectMsg
+    57 0000006E [0000000000000000] 
+    58 00000076 BA11000000                      mov rdx, correct_password_len
+    59                                  
+    60                                  WriteMsg:
+    61 0000007B B801000000                      mov rax, 0x01
+    62 00000080 BF01000000                      mov rdi, 1
+    63 00000085 0F05                            syscall
+    64                                  
+    65 00000087 B83C000000                      mov rax, 0x3c
+    66 0000008C 4831FF                          xor rdi, rdi            
+    67 0000008F 0F05                            syscall
+    68                                  
+    69                                  section .data
+    70                                  
+    71                                  CorrectMsg:
+    72 00000000 436F72726563742070-             db "Correct password", 10, 0
+    72 00000009 617373776F72640A00 
+    73                                  IncorrectMsg:
+    74 00000012 496E636F7272656374-             db "Incorrect password", 10, 0
+    74 0000001B 2070617373776F7264-
+    74 00000024 0A00               
+    75                                  
+    76                                  UserPasswordBuffer:
+    77 00000026 <res 80h>                       resb user_password
+    77          ******************       warning: uninitialized space declared in non-BSS section `.data': zeroing [-w+zeroing]
+    78                                  CorrectPasswordBuf:
+    79 000000A6 3133333700                      db "1337", 0
