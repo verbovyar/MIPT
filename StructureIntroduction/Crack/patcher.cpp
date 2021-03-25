@@ -1,24 +1,29 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+
+#include <iostream>
 
 const int SCREEN_WIDTH 	= 1280;
 const int SCREEN_HEIGHT = 720;
 
-struct Text {
+struct Text
+{
     char* buffer     = NULL;
     size_t text_size = 0;
 };
 
-struct App {
+struct App
+{
     SDL_Renderer *renderer = NULL;
-    SDL_Window *window     = NULL;
-    SDL_Surface *error     = NULL;
-    SDL_Texture * texture  = NULL;
+    SDL_Window   *window   = NULL;
+    SDL_Surface  *error    = NULL;
+    SDL_Texture  *texture  = NULL;
 };
 
 size_t GetFileSize(const char* file_name) 
@@ -172,6 +177,53 @@ void DrawRect(App* app, int perc)
     SDL_RenderFillRect(app->renderer, &prog);
 }
 
+//--------------------------------
+
+SDL_Texture* RenderText(const std::string &message, const std::string &font_file,
+        SDL_Color color, int font_size, SDL_Renderer *renderer)
+{
+	TTF_Font *font = TTF_OpenFont(font_file.c_str(), font_size); 
+	assert(font);     
+
+	SDL_Surface *surf = TTF_RenderText_Blended(font, message.c_str(), color);
+	assert(surf);
+
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
+
+	SDL_FreeSurface(surf);
+	TTF_CloseFont(font);
+
+	return texture;
+}
+
+void RenderTexture(SDL_Texture *text, SDL_Renderer *renderer, int x, int y)
+{
+	SDL_Rect dst = {};
+	dst.x = x;
+	dst.y = y;
+	dst.w = 1000;
+	dst.h = 100;
+	SDL_RenderCopy(renderer, text, NULL, &dst);
+}
+
+void DrawText(App* app)
+{
+	SDL_Color color = { 255, 255, 255, 255 };
+	SDL_Texture *image = RenderText("Oops, i think file was cracked, sorry!", "SouthernAire_Personal_Use_Only.ttf",
+			color, 64, app->renderer);
+
+	int w = 0;
+	int h = 0;
+	SDL_QueryTexture(image, NULL, NULL, &w, &h);
+	int x = SCREEN_WIDTH / 2 - w / 2;
+	int y = SCREEN_HEIGHT / 2 - h / 2;	
+
+	SDL_RenderClear(app->renderer);
+
+	RenderTexture(image, app->renderer, 10, 10);
+	SDL_RenderPresent(app->renderer);
+}
+
 int main(int argc, char *argv[])
 {
     Text text = ReadFileToBuffer("pass.out");
@@ -200,6 +252,15 @@ int main(int argc, char *argv[])
         
         SDL_Delay(32);
     }
+
+    TTF_Init();
+
+    int timer = 0;
+	while (timer != 3000)
+	{
+		DrawText(&app);
+		++timer;
+	}
 
     return 0;
 }
