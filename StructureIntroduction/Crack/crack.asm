@@ -1,18 +1,23 @@
 global _start
 
-section .data
-
 user_password          equ 128
 right_password         equ 5
 count_of_smbls         equ 1
 correct_password_len   equ 17
 incorrect_password_len equ 19
+password_msg_len       equ 16
 
 section .text
 
 ;nasm -f elf64 -l crack.lst crack.asm && ld -s -o crack  crack.o && ./crack
 
 _start:
+        mov rsi, PasswordMsg
+        mov rdx, password_msg_len
+        mov rax, 0x01
+        mov rdi, 1
+        syscall
+
         mov r9, UserPasswordBuffer
         dec r9
 
@@ -67,6 +72,9 @@ WriteMsg:
         syscall
 
 section .data
+
+PasswordMsg:
+        db "Enter password:", 10, 0
 
 CorrectMsg:
         db "Correct password", 10, 0
