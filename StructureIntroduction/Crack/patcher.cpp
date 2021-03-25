@@ -9,15 +9,15 @@ const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 
 struct Text {
-    char* buffer = NULL;
+    char* buffer     = NULL;
     size_t text_size = 0;
 };
 
 struct App {
 	SDL_Renderer *renderer = NULL;
-	SDL_Window *window = NULL;
-    SDL_Surface *error = NULL;
-	SDL_Texture * texture = NULL;
+	SDL_Window *window     = NULL;
+	SDL_Surface *error     = NULL;
+	SDL_Texture * texture  = NULL;
 };
 
 size_t GetFileSize(const char* file_name) 
@@ -76,8 +76,10 @@ void Write(Text* text)
 
 void InitSDL(App* app)
 {
+	assert(app != NULL);
+
 	int renderer_flags = 0; 
-    int window_flags = 0;
+	int window_flags = 0;
 
 	renderer_flags = SDL_RENDERER_ACCELERATED;
 	
@@ -110,7 +112,9 @@ void InitSDL(App* app)
 
 void DoInput(App* app)
 {
-	SDL_Event event;
+	assert(app != NULL);
+
+	SDL_Event event = {};
 	
 	while (SDL_PollEvent(&event))
 	{
@@ -128,6 +132,8 @@ void DoInput(App* app)
 
 void PrepareScene(App* app)
 {
+	assert(app != NULL);
+
 	app->error = SDL_LoadBMP("Error.bmp");
 	app->texture = SDL_CreateTextureFromSurface(app->renderer, app->error);
 
@@ -137,12 +143,15 @@ void PrepareScene(App* app)
 
 void PresentScene(App* app)
 {
+	assert(app != NULL);
+
 	SDL_RenderPresent(app->renderer);
 }
 
 void DrawRect(App* app, int perc)
 {
-	
+	assert(app != NULL);
+
 	int x = 490;
 	int w = 300;
 	int y = 500;
