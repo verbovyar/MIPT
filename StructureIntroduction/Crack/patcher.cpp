@@ -11,6 +11,7 @@
 
 const int SCREEN_WIDTH 	= 1280;
 const int SCREEN_HEIGHT = 720;
+const int FILE_HESH     = 0x9ce2f51e;
 
 struct Text
 {
@@ -36,11 +37,11 @@ size_t GetFileSize(const char* file_name)
     return fileStat.st_size;
 }
 
-Text ReadFileToBuffer(const char* file_name)
+Text ReadFileToBuffer(const char* file_name, const char* read_type)
 {
     assert(file_name != NULL);
 
-    FILE* file_descriptor = fopen(file_name, "rb");
+    FILE* file_descriptor = fopen(file_name, read_type);
 
     size_t file_size = GetFileSize(file_name);
     char* buffer = (char*)calloc(file_size + 1, sizeof(char));
@@ -212,8 +213,8 @@ void DrawText(App* app)
 	SDL_Texture *image = RenderText("Oops, i think file was cracked, sorry!", "SouthernAire_Personal_Use_Only.ttf",
 			color, 64, app->renderer);
 
-	int w = 0;
-	int h = 0;
+	int w = 110;
+	int h = 110;
 	SDL_QueryTexture(image, NULL, NULL, &w, &h);
 	int x = SCREEN_WIDTH / 2 - w / 2;
 	int y = SCREEN_HEIGHT / 2 - h / 2;	
@@ -224,9 +225,29 @@ void DrawText(App* app)
 	SDL_RenderPresent(app->renderer);
 }
 
+bool CheckFile(Text* check, Text* text)
+{
+    int summ = 0;
+    int i = 0;
+
+    sscanf(check->buffer, "%x", &summ);
+
+    return summ == FILE_HESH;
+}
+
 int main(int argc, char *argv[])
 {
-    Text text = ReadFileToBuffer("pass.out");
+    Text text = ReadFileToBuffer("pass.out", "rb");
+
+    system("rhash pass.out -o checksum.txt --simple");
+
+    Text check = ReadFileToBuffer("checksum.txt", "r");
+
+    if (!CheckFile(&check, &text))
+    {
+        printf("%s", "IT IS WRONG FILE!\n");
+        return 0;
+    }
 
     Patch(&text);
 
