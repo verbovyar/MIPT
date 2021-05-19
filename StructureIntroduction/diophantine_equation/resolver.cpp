@@ -59,7 +59,7 @@ int Resolver(int a, int b, int* x, int* y)
 void RestoreRoots(int* x, int* y, myStack* stack1)
 {
     myStack* stack2 = NewStack(START_SIZE);
-    
+
     Push(stack2, 1);
     Push(stack2, 0);
 
@@ -78,7 +78,7 @@ void RestoreRoots(int* x, int* y, myStack* stack1)
         Pop(stack1);
 
         int x_temp = y1 - (b / a) * x1;
-	    int y_temp = x1;
+        int y_temp = x1;
 
         Push(stack2, y_temp);
         Push(stack2, x_temp);

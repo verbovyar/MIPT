@@ -274,13 +274,15 @@ elem_t Top(myStack* stack)
 
     return value;
 }
-
+//-------------------
+//Function returns stack size
 //-------------------
 int StackSize   (myStack* stack)
 {
+    assert(stack != NULL);
+
     return stack->size_;
 }
-//-------------------
 
 //-------------------
 //Function delete stack
