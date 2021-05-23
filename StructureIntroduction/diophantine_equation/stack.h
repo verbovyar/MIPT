@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //-------------------
 //elem_t - stack content type
@@ -15,7 +16,7 @@ typedef int elem_t;
 const elem_t LEFT_CNRY       = 0x212121;
 const elem_t RIGHT_CNRY      = 0x121212;
 const elem_t POISON_VALUE    = -1;
-const int    INCREASE_FACTOR = 2;
+const int    INCREASE_FACTOR = 4;
 
 //-------------------
 //struct Stack -

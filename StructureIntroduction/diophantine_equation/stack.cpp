@@ -80,7 +80,7 @@ void Construct(myStack* stack, size_t start_size)
 
 #else
 
-    elem_t* temp = (elem_t*)calloc(1, start_size * sizeof(elem_t));
+    elem_t* temp = (elem_t*)calloc(start_size, sizeof(elem_t));
     if (temp == NULL) { return; }
 
 #endif
@@ -90,10 +90,7 @@ void Construct(myStack* stack, size_t start_size)
     stack->capacity_        = start_size;
     stack->increase_factor_ = INCREASE_FACTOR;
 
-    for (int i = 1; i <= start_size; ++i) 
-    {
-        stack->array_[i] = POISON_VALUE;
-    }
+    memset(stack->array_, POISON_VALUE, stack->capacity_);
 //-----
 
 #ifdef STACK_DEBUG
@@ -152,11 +149,6 @@ void StackNewSize(myStack* stack)
         #endif
 
             stack->capacity_ *= stack->increase_factor_;
-
-            for (int i = stack->size_; i < stack->capacity_; ++i)
-            {
-                stack->array_[i] = POISON_VALUE;
-            }
 
         #ifdef STACK_DEBUG
 
@@ -277,7 +269,7 @@ elem_t Top(myStack* stack)
 //-------------------
 //Function returns stack size
 //-------------------
-int StackSize   (myStack* stack)
+int StackSize(myStack* stack)
 {
     assert(stack != NULL);
 
@@ -296,10 +288,10 @@ void DeleteStack(myStack* stack)
 
     ASSERTOK(stack)
 
-    stack->array_    = NULL;
     stack->size_     = 0;
     stack->capacity_ = 0;
 
+    free(stack->array_);
     free(stack);
 
 #ifdef STACK_DEBUG

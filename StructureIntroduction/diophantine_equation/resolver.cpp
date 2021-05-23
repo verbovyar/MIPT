@@ -3,10 +3,20 @@
 const int START_SIZE = 500;
 
 //-------------------
+void Input       (int *a, int* b, int* c);
 int  Resolver    (int a, int b, int* x, int* y);
 void RestoreRoots(int* x, int* y, myStack* stack1);
 void GetAnswer   (int c, int gcd, int x, int y);
 //-------------------
+
+void Output(myStack* stack)
+{
+    for (int i = 1; i <= stack->size_; ++i) 
+    {
+        printf("array[%d] = %d\n", i - 1, stack->array_[i]);
+    }
+    printf("\n");
+}
 
 int main()
 {
@@ -17,13 +27,22 @@ int main()
     int b = 0;
     int c = 0;
 
-    scanf("%d %d %d", &a, &b, &c);
+    Input(&a, &b, &c);
 
     int gcd = Resolver(a, b, &x, &y);
 
     GetAnswer(c, gcd, x, y);
 
     return 0;
+}
+
+void Input(int *a, int* b, int* c)
+{
+    scanf("%d", a);
+
+    scanf("%d", b);
+    
+    scanf("%d", c);
 }
 
 int Resolver(int a, int b, int* x, int* y)
@@ -33,20 +52,26 @@ int Resolver(int a, int b, int* x, int* y)
     Push(stack1, a);
     Push(stack1, b);
 
+    Output(stack1);
+
     while (a != 0)
     {
         int temp = a;
         a = b % a;
         b = temp;
 
-        Push(stack1, a);
-        Push(stack1, b);
+        if (a != 0)
+        {
+            Push(stack1, a);
+            Push(stack1, b);
+
+            Output(stack1);
+        }
     }
 
-    Pop(stack1);
-    Pop(stack1);
-
     int gcd = b;
+
+    printf("----------------------\n");
 
     RestoreRoots(x, y, stack1);
 
@@ -82,6 +107,8 @@ void RestoreRoots(int* x, int* y, myStack* stack1)
 
         Push(stack2, y_temp);
         Push(stack2, x_temp);
+
+        Output(stack2);
     }
 
     *x = Top(stack2);
