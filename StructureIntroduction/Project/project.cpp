@@ -1,4 +1,4 @@
-#include "Geoma.h"
+#include "figures.h"
 
 int main() {
     double width = 1000;
